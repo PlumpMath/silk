@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <assert.h>
 #include <errno.h>
+#define __USE_XOPEN_EXTENDED
+#include <unistd.h> 
 #define __USE_MISC
 #include <sys/mman.h>
 #include "silk.h"
@@ -28,7 +30,11 @@ static void silk__main (void) /*__attribute__((no_return))*/
 {
     struct silk_execution_thread_t         *exec_thr = silk__my_thread_obj();
     struct silk_engine_t                   *engine = exec_thr->engine;
-    struct silk_msg_t       msg;
+    /*
+     * BEWARE: this pointer is just a syntactic-sugar. its a stack variable which 
+     * points to a single msg instance used by ALL silks of this engine !!!
+     */
+    const struct silk_msg_t                *m = &exec_thr->last_msg;
     const silk_id_t         my_silk_id = silk__my_id();
     struct silk_t           *s = &engine->silks[my_silk_id/*SILK_INITIAL_ID*/];
     struct silk_t           *silk_trgt;
@@ -40,7 +46,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
     do {
         // retrieve the next msg (based on priorities & any other application
         // specific rule) to be processed.
-        if (silk_sched_get_next(&exec_thr->engine->msg_sched, &msg)) {
+        if (silk_sched_get_next(&exec_thr->engine->msg_sched, &exec_thr->last_msg)) {
             /*
              * swap context into the silk which received the msg.
              * BEWARE: 
@@ -51,20 +57,20 @@ static void silk__main (void) /*__attribute__((no_return))*/
              * stack-pointer which is pushed into while saving the state. it will cause
              * us to return on the stack as if "before" we saved the state. very bad !!!
              */
-            if (likely(s->silk_id != msg.silk_id)) {
-                silk_trgt = &engine->silks[msg.silk_id];
-                assert(silk_trgt->silk_id == msg.silk_id);
+            if (likely(s->silk_id != m->silk_id)) {
+                silk_trgt = &engine->silks[m->silk_id];
+                assert(silk_trgt->silk_id == m->silk_id);
                 SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
                 SILK_SWITCH(silk_trgt, s);
                 SILK_DEBUG("switching control into Silk#%d", s->silk_id);
             }
-            switch (msg.msg) {
+            switch (m->msg) {
             case SILK_MSG_BOOT:
                 SILK_DEBUG("Silk#%d processing BOOT msg", s->silk_id);
                 break;
 
             case SILK_MSG_START:
-                s = silk_get_ctrl_from_id(engine, msg.silk_id);
+                s = silk_get_ctrl_from_id(engine, m->silk_id);
                 assert(SILK_STATE(s) == SILK_STATE__ALLOC);
                 SILK_INFO("silk %d starting", silk__my_id());
                 silk__set_state(s, SILK_STATE__RUN);
@@ -76,7 +82,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
 
             case SILK_MSG_TERM:
                 SILK_INFO("silk thread %lu:%d processing TERM msg", 
-                          exec_thr->id, msg.silk_id);
+                          exec_thr->id, m->silk_id);
                 /*
                  * BEWARE: we push the silk on which we currently execute to the free list.
                  * This is OK as long as the addition of the silk to the free list is
@@ -310,7 +316,11 @@ silk_init (struct silk_engine_t               *engine,
     }
 
     // wait until all BOOT msgs are processed.
-    sleep(2);
+    while (!silk_sched_is_empty(&engine->msg_sched)) {
+        SILK_DEBUG("waiting for all BOOT msgs to be processed");
+        usleep(1);
+    }
+    SILK_DEBUG("All Silks completed booting !");
 
     return SILK_STAT_OK;
 
@@ -433,7 +443,6 @@ silk_dispatch(struct silk_engine_t   *engine,
 /*
  * a ping pong example to measure performance of silk scheduling.
  */
-#include <unistd.h> 
 static void
 ping_pong_idle_cb (struct silk_execution_thread_t   *exec_thr)
 {

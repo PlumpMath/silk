@@ -129,6 +129,8 @@ struct silk_execution_thread_t {
      * the engine, when the processing thread needs to terminate
      */
     struct silk_exec_state_t           exec_state;
+    // the current msg we are reading or that is being processed
+    struct silk_msg_t                  last_msg;
 };
 
  
@@ -198,6 +200,19 @@ silk_id_t silk__my_id()
     assert((stk_addr >= stk_start) && (stk_addr < stk_end));
     silk_id = (stk_addr - stk_start) / SILK_PADDED_STACK(&engine->cfg);
     return silk_id;
+}
+
+/*
+ * This API allows the scheduler to take the calling Silk out-of-execution & switch 
+ * to another silk instance. the specifics of such a decision is scheduler-specific.
+ * When the function returns, the msg which awoke the silk is returned so it can be 
+ * processed
+*/
+void silk_yield(struct silk_msg_t   *msg)
+{
+    //struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
+    //TODO: move the scratch msg to the thread object so it exists per thread per engine
+
 }
 
 #endif // __SILK_H__

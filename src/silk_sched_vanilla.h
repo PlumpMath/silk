@@ -2,7 +2,7 @@
  * Copyight (C) Eitan Ben-Amos, 2012
  */
 #ifndef __SILK_SCHED_VANILLA_H__
-#define __SILK_SCHED_VANILLAH__
+#define __SILK_SCHED_VANILLA_H__
 
 
 /*
@@ -88,7 +88,7 @@ silk_sched_is_empty(struct silk_incoming_msg_queue_t      *q)
     bool   ret;
 
     pthread_mutex_lock(&q->mtx);
-    ret = silk_sched_is_empty(q);
+    ret = _silk_sched_is_empty(q);
     pthread_mutex_unlock(&q->mtx);
     return ret;
 }
@@ -165,4 +165,4 @@ bool silk_sched_get_next(struct silk_incoming_msg_queue_t      *q,
 }
 
 
-#endif // __SILK_SCHED_H__
+#endif // __SILK_SCHED_VANILLA_H__
