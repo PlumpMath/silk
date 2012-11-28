@@ -53,7 +53,7 @@ struct silk_engine_param_t {
     // The number if 4KB pages to separate between consecutive silk stack buffers
     uint32_t             num_stack_seperator_pages;
     // The number of silk instance to create
-    unsigned             num_silk;
+    uint32_t             num_silk;
     // the callback function to be called when the engine has nothing to do (i.e.: no msgs to process)
     silk_engine_idle_callback_t         idle_cb;
     // a context to be attached by the application to the Silk execution object
@@ -153,6 +153,8 @@ struct silk_engine_t {
     struct silk_engine_param_t             cfg;
     // indicate when the thread should terminate itself.
     bool                                   terminate;
+    // The number of Silks in free state
+    uint32_t                               num_free_silk;
 };
 
 // verify that a silk ID is valid.

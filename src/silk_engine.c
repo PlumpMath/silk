@@ -19,6 +19,27 @@
  */
 #define SILK_INITIAL_ID   0
 
+
+/*
+ * Queries the engine object whether it has completed its initialization & is ready to work
+ */
+static inline bool
+silk_eng_is_ready (struct silk_engine_t      *engine)
+{
+    bool   ret;
+
+    pthread_mutex_lock(&engine->mtx);
+    if (engine->num_free_silk == engine->cfg.num_silk) {
+        ret = true;
+    } else {
+        ret = false;
+    }
+    pthread_mutex_unlock(&engine->mtx);
+
+    return ret;
+}
+
+
 /*
  * This is the internal entry function of all silks.
  * a silk uthread starts its life here & then allocated, runs & 
@@ -43,6 +64,9 @@ static void silk__main (void) /*__attribute__((no_return))*/
                 SILK_DEBUG("Silk#%d processing BOOT msg", s->silk_id);
                 assert(SILK_STATE(s) == SILK_STATE__BOOT);
                 silk__set_state(s, SILK_STATE__FREE);
+                pthread_mutex_lock(&engine->mtx);
+                engine->num_free_silk++;
+                pthread_mutex_unlock(&engine->mtx);
                 break;
 
             case SILK_MSG_START:
@@ -212,6 +236,7 @@ silk_init (struct silk_engine_t               *engine,
     memset(engine, 0, sizeof(*engine));
     memcpy(&engine->cfg, param, sizeof(engine->cfg));
     engine->terminate = false;
+    engine->num_free_silk = 0;
     pthread_mutex_init(&engine->mtx,NULL);
 
     /*
@@ -310,7 +335,8 @@ silk_init (struct silk_engine_t               *engine,
     }
 
     // wait until all BOOT msgs are processed.
-    while (!silk_sched_is_empty(&engine->msg_sched)) {
+    //while (!silk_sched_is_empty(&engine->msg_sched)) {
+    while (!silk_eng_is_ready(engine)) {
         SILK_DEBUG("waiting for all BOOT msgs to be processed");
         usleep(10);
     }

@@ -116,6 +116,8 @@ silk_sched_is_full(struct silk_incoming_msg_queue_t      *q)
     pthread_mutex_unlock(&q->mtx);
     return ret;
 }
+
+
 /*
  * if queue isnt full, write the msg into the tail of the queue
  * internal Silk library API, for engine layer only
