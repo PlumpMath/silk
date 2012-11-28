@@ -5,7 +5,7 @@ DBG :send msg={code=1, id=1, ctx=(nil)
 DBG :send msg={code=1, id=2, ctx=(nil)
 DBG :send msg={code=1, id=2, ctx=(nil)
 DBG :waiting for all BOOT msgs to be processed
-INFO:Thread starting. id=3078191936
+INFO:Thread starting. id=3078310720
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)
 DBG :Silk#0 processing BOOT msg
@@ -92,7 +92,7 @@ Silk termination returns:0
 DBG :recv msg={code=4, id=0, ctx=(nil)
 DBG :switching from Silk#2 to Silk#0
 DBG :switched into Silk#0
-INFO:kernel thread 3078191936 processing TERM msg
-INFO:thread 3078191936 switching back to pthread stack
-INFO:Thread exiting. id=3078191936
+INFO:kernel thread 3078310720 processing TERM msg
+INFO:thread 3078310720 switching back to pthread stack
+INFO:Thread exiting. id=3078310720
 Silk join returns:0

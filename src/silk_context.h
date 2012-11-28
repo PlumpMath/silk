@@ -26,17 +26,17 @@
 
 /*
  * This macto (it cannot be an inline function) causes a context switch between two 
- * __DIFFERENT__ silk instances.
+ * __DIFFERENT__ silk execution-state instances.
  * Input:
- * to   - this is the "struct silk_t" of the instance we switch into
- * from - this is the "struct silk_t" of the instance we switch out-of
+ * to   - this is the "struct silk_exec_state_t" of the instance we switch into
+ * from - this is the "struct silk_exec_state_t" of the instance we switch out-of
  */
 #if defined (__i386__)
-#define SILK_SWITCH(to, from)  silk_swap_stack_context((to)->exec_state.esp, &((from)->exec_state.esp));
+#define SILK_SWITCH(to, from)  silk_swap_stack_context((to).esp, &((from).esp));
 #elif defined (__x86_64__)
 #error "not implemented"
 // it should be of the form:
-#define SILK_SWITCH(to, from)  silk_swap_stack_context((to)->exec_state, &((from)->exec_state));
+#define SILK_SWITCH(to, from)  silk_swap_stack_context(&(to), &(from));
 #endif
 
 

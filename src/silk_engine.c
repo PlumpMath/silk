@@ -111,6 +111,9 @@ static void silk__main (void) /*__attribute__((no_return))*/
         }
     } while (likely(engine->terminate == false));
     SILK_INFO("thread %lu switching back to pthread stack", exec_thr->id);
+#if 1
+    SILK_SWITCH(exec_thr->exec_state, s->exec_state);
+#else
 #if defined (__i386__)
     silk_swap_stack_context(exec_thr->exec_state.esp, &s->exec_state.esp);
 #elif defined (__x86_64__)
@@ -118,6 +121,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
     // it should be of the form:
     silk_swap_stack_context(&exec_thr->exec_state, &s->exec_state);
 #endif
+#endif //SILK_SWITCH()
 }
 
 /*
@@ -147,6 +151,9 @@ static void *silk__thread_entry(void *ctx)
      * for our execution until we switch into a silk for processng its msg.
      */
     s = silk_get_ctrl_from_id(engine, silk_id);
+#if 1
+    SILK_SWITCH(s->exec_state, exec_thr->exec_state);
+#else
 #if defined (__i386__)
     silk_swap_stack_context(s->exec_state.esp, &exec_thr->exec_state.esp);
 #elif defined (__x86_64__)
@@ -154,6 +161,7 @@ static void *silk__thread_entry(void *ctx)
     // it should be of the form:
     silk_swap_stack_context(&s->exec_state, &exec_thr->exec_state);
 #endif
+#endif //SILK_SWITCH()
     // we get here only if the engine is terminating !!!
     SILK_INFO("Thread exiting. id=%lu", exec_thr->id);
     return NULL;
@@ -423,7 +431,7 @@ void silk_yield(struct silk_msg_t   *msg)
                 silk_trgt = &engine->silks[msg_silk_id];
                 assert(silk_trgt->silk_id == msg_silk_id);
                 SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
-                SILK_SWITCH(silk_trgt, s);
+                SILK_SWITCH(silk_trgt->exec_state, s->exec_state);
                 SILK_DEBUG("switched into Silk#%d", s->silk_id);
             }
             memcpy(msg, &exec_thr->last_msg, sizeof(*msg));
