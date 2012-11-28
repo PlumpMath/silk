@@ -8,6 +8,8 @@
 #ifndef __SILK_TLS_H__
 #define __SILK_TLS_H__
 
+#include <assert.h>
+
 /*
  * The various TLS object we need to maintain
  */
@@ -39,7 +41,7 @@ void *silk__get_tls(int  index)
 
 #else
 
-__thread   void *silk_tls[SILK_TLS__MAX];
+extern __thread   void *silk_tls[SILK_TLS__MAX];
 
 /*
  * when called by a thread which executes silks, it will return the thread object that 
@@ -48,13 +50,15 @@ __thread   void *silk_tls[SILK_TLS__MAX];
  * Notes:
  * Attempting this with pthread_{get,set}specific() fails.
  */
-void silk__set_tls(enum silk_tls_id_e  id, void *p)
+static inline void
+silk__set_tls(enum silk_tls_id_e  id, void *p)
 {
     assert((id >= 0) && (id < SILK_TLS__MAX));
     silk_tls[id] = p;
 }
 
-void *silk__get_tls(enum silk_tls_id_e  id)
+static inline void *
+silk__get_tls(enum silk_tls_id_e  id)
 {
     assert((id >= 0) && (id < SILK_TLS__MAX));
     return silk_tls[id];

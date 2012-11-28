@@ -1,0 +1,62 @@
+Initializing Silk engine...
+DBG :waiting for all BOOT msgs to be processed
+INFO:Thread starting. id=3077933888
+DBG :waiting for all BOOT msgs to be processed
+DBG :Silk#0 booting...
+DBG :Silk#0 processing BOOT msg
+DBG :switching from Silk#0 to Silk#1
+DBG :Silk#1 booting...
+DBG :Silk#1 processing BOOT msg
+DBG :switching from Silk#1 to Silk#2
+DBG :Silk#2 booting...
+DBG :Silk#2 processing BOOT msg
+DBG :switching from Silk#2 to Silk#3
+DBG :Silk#3 booting...
+DBG :Silk#3 processing BOOT msg
+ping pong idle
+DBG :All Silks completed booting !
+Silk initialization returns:0
+allocacated silk No 0
+dispatched silk No 0
+allocacated silk No 1
+dispatched silk No 1
+allocacated silk No 2
+dispatched silk No 2
+DBG :switching from Silk#3 to Silk#0
+DBG :switched into Silk#0
+INFO:silk 0 starting
+ping_pong_entry_func: starts... (arg=0)
+ping_pong_entry_func: stack variable address: &stk_var=0x0xb000ffa8
+ping_pong_entry_func: ends!!!
+INFO:silk 0 ended
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:silk 1 starting
+ping_pong_entry_func: starts... (arg=1)
+ping_pong_entry_func: stack variable address: &stk_var=0x0xb0023fa8
+ping_pong_entry_func: ends!!!
+INFO:silk 1 ended
+DBG :switching from Silk#1 to Silk#2
+DBG :switched into Silk#2
+INFO:silk 2 starting
+ping_pong_entry_func: starts... (arg=2)
+ping_pong_entry_func: stack variable address: &stk_var=0x0xb0037fa8
+ping_pong_entry_func: ends!!!
+INFO:silk 2 ended
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+ping pong idle
+Silk termination returns:0
+DBG :switching from Silk#2 to Silk#0
+DBG :switched into Silk#0
+INFO:kernel thread 3077933888 processing TERM msg
+INFO:thread 3077933888 switching back to pthread stack
+INFO:Thread exiting. id=3077933888
+Silk join returns:0

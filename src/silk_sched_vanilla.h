@@ -4,6 +4,7 @@
 #ifndef __SILK_SCHED_VANILLA_H__
 #define __SILK_SCHED_VANILLA_H__
 
+#include <memory.h>
 
 /*
  * The first scheduler is a very basic one with which we develop the core library. it is:
@@ -35,7 +36,7 @@ struct silk_incoming_msg_queue_t {
 };
 
 
-enum silk_status_e
+static inline enum silk_status_e
 silk_sched_init(struct silk_incoming_msg_queue_t      *q)
 {
     q->next_write = 0;
@@ -48,7 +49,7 @@ silk_sched_init(struct silk_incoming_msg_queue_t      *q)
 /*
  * terminate a msg scheduler
  */
-enum silk_status_e
+static inline enum silk_status_e
 silk_sched_terminate(struct silk_incoming_msg_queue_t      *q)
 {
     pthread_mutex_destroy(&q->mtx);
@@ -119,7 +120,7 @@ silk_sched_is_full(struct silk_incoming_msg_queue_t      *q)
  * if queue isnt full, write the msg into the tail of the queue
  * internal Silk library API, for engine layer only
  */
-enum silk_status_e
+static inline enum silk_status_e
 silk_sched_send(struct silk_incoming_msg_queue_t      *q,
                 struct silk_msg_t                     *msg)
 {
@@ -127,8 +128,8 @@ silk_sched_send(struct silk_incoming_msg_queue_t      *q,
 
     pthread_mutex_lock(&q->mtx);
     if (_silk_sched_is_full(q)) {
-	silk_stat = SILK_STAT_Q_FULL;
-	goto out;
+        silk_stat = SILK_STAT_Q_FULL;
+        goto out;
     }
     q->msgs[q->next_write] = *msg;
     q->next_write++;
@@ -145,8 +146,9 @@ silk_sched_send(struct silk_incoming_msg_queue_t      *q,
  * queue, etc
  * return true when a msg is returned, false otherwise
  */
-bool silk_sched_get_next(struct silk_incoming_msg_queue_t      *q,
-                         struct silk_msg_t                     *msg)
+static inline bool
+silk_sched_get_next(struct silk_incoming_msg_queue_t      *q,
+                    struct silk_msg_t                     *msg)
 {
     bool ret;
 

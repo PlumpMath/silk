@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include "silk_base.h"
 #include "silk_tls.h"
 #include "silk_sched.h"
@@ -183,9 +184,9 @@ silk_get_ctrl_from_id(struct silk_engine_t   *engine,
 /*
  * returns the silk id of the caller
  * we use the stack address to find the silk instance
- * TODO: test this API. just write a program to allocate all silks & execute each to verify its own ID
  */
-silk_id_t silk__my_id()
+static inline silk_id_t
+silk__my_id()
 {
     struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
     struct silk_engine_t           *engine = exec_thr->engine;
@@ -213,47 +214,28 @@ silk__my_ctrl()
     const silk_id_t                 my_silk_id = silk__my_id();
     return &engine->silks[my_silk_id];
 }
-/*
- * This API allows the scheduler to take the calling Silk out-of-execution & switch 
- * to another silk instance. the specifics of such a decision is scheduler-specific.
- * When the function returns, the msg which awoke the silk is returned so it can be 
- * processed
-*/
-//TODO: make this return "void"!!!
-bool silk_yield(struct silk_msg_t   *msg)
-{
-    struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
-    struct silk_engine_t           *engine = exec_thr->engine;
-    struct silk_t                  *s = silk__my_ctrl();
-    struct silk_t                  *silk_trgt;
-    silk_id_t                       msg_silk_id;
-    
 
-    // retrieve the next msg (based on priorities & any other application
-    // specific rule) to be processed.
-    if (silk_sched_get_next(&exec_thr->engine->msg_sched, &exec_thr->last_msg)) {
-        /*
-         * swap context into the silk which received the msg.
-         * BEWARE: 
-         * 1) 's' was set in previous loop iteration & hence it has the older silk 
-         * object, which executed the last msg
-         * 2) we must  optimize the case where we can skip switching from one instance to itself.
-         * otherwise, we'll send the "current" stack-pointer as target & save a 
-         * stack-pointer which is pushed into while saving the state. it will cause
-         * us to return on the stack as if "before" we saved the state. very bad !!!
-         */
-        msg_silk_id = exec_thr->last_msg.silk_id;
-        if (likely(s->silk_id != msg_silk_id)) {
-            silk_trgt = &engine->silks[msg_silk_id];
-            assert(silk_trgt->silk_id == msg_silk_id);
-            SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
-            SILK_SWITCH(silk_trgt, s);
-            SILK_DEBUG("switched into Silk#%d", s->silk_id);
-        }
-        memcpy(msg, &exec_thr->last_msg, sizeof(*msg));
-        return true;
-    }
-    return false;
-}
+//TODO: make this return "void"!!!
+bool silk_yield(struct silk_msg_t   *msg);
+
+enum silk_status_e
+silk_init (struct silk_engine_t               *engine,
+           const struct silk_engine_param_t   *param);
+
+enum silk_status_e
+silk_terminate(struct silk_engine_t   *engine);
+
+enum silk_status_e
+silk_join(struct silk_engine_t   *engine);
+
+enum silk_status_e
+silk_alloc(struct silk_engine_t   *engine,
+           silk_uthread_func_t    entry_func,
+           void                   *entry_func_arg,
+           struct silk_t        **silk);
+
+enum silk_status_e
+silk_dispatch(struct silk_engine_t   *engine,
+              struct silk_t          *s);
 
 #endif // __SILK_H__
