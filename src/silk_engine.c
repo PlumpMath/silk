@@ -76,8 +76,16 @@ static void silk__main (void) /*__attribute__((no_return))*/
                 silk__set_state(s, SILK_STATE__RUN);
                 s->entry_func(s->entry_func_arg);
                 assert(SILK_STATE(s) == SILK_STATE__RUN);
-                silk__set_state(s, SILK_STATE__TERM);
+                silk__set_state(s, SILK_STATE__FREE);
+                pthread_mutex_lock(&engine->mtx);
+                engine->num_free_silk++;
+                pthread_mutex_unlock(&engine->mtx);
                 SILK_INFO("silk %d ended", silk__my_id());
+                /*
+                  push the terminated silk instance to head of queue. better for CPU cache behavior
+                  * p.s. : it will also reveal misuse of silk stack after its termination much faster.
+                  */
+                SLIST_INSERT_HEAD(&engine->free_silks, s, next_free);
                 break;
 
             case SILK_MSG_TERM:
@@ -238,6 +246,7 @@ silk_init (struct silk_engine_t               *engine,
     engine->terminate = false;
     engine->num_free_silk = 0;
     pthread_mutex_init(&engine->mtx,NULL);
+    SLIST_INIT(&engine->free_silks);
 
     /*
      * allocate memory for stacks
@@ -298,9 +307,18 @@ silk_init (struct silk_engine_t               *engine,
     for (i=0, addr=engine->stack_addr, s=engine->silks;
          i < param->num_silk;
          i++, addr += SILK_PADDED_STACK(param), s++) {
+        // chain the silk instance into the free list. we chain them by their silk_ID :)
+        if (i == 0) {
+            SLIST_INSERT_HEAD(&engine->free_silks, s, next_free);
+        } else {
+            SLIST_INSERT_AFTER(s-1, s, next_free);
+        }
+        // mark the silk control state as in BOOT phase
         silk__set_state(&engine->silks[i], SILK_STATE__BOOT);
+        // initialize the unique silk-ID within the silk control object
         engine->silks[i].silk_id = i;
         assert(addr == silk_get_stack_from_id(engine, i));
+        // initialize stack context for each silk instance
         silk_create_initial_stack_context(&s->exec_state,
                                           silk__main,
                                           addr,//silk_get_stack_from_id(engine, msg.silk_id),
@@ -335,7 +353,6 @@ silk_init (struct silk_engine_t               *engine,
     }
 
     // wait until all BOOT msgs are processed.
-    //while (!silk_sched_is_empty(&engine->msg_sched)) {
     while (!silk_eng_is_ready(engine)) {
         SILK_DEBUG("waiting for all BOOT msgs to be processed");
         usleep(10);
@@ -461,27 +478,30 @@ silk_alloc(struct silk_engine_t   *engine,
            void                   *entry_func_arg,
            struct silk_t        **silk)
 {
-    pthread_mutex_lock(&engine->mtx);
-    // TODO: alloc a Silk instance
-    static int silk_id = 0;
     struct silk_t  *s;
     enum silk_status_e   silk_stat;
 
 
-    // TODO: for now were sure we have a free silk :)
-    assert(silk_id < engine->cfg.num_silk);
-    silk_stat = SILK_STAT_OK;
+    pthread_mutex_lock(&engine->mtx);
+    // take a silk instance off the free list (if possible)
+    if (likely(!SLIST_EMPTY(&engine->free_silks))) {
+        s = SLIST_FIRST(&engine->free_silks);
+        SLIST_REMOVE_HEAD(&engine->free_silks, next_free);
+        engine->num_free_silk--;
+        SILK_DEBUG("allocated Silk#%d. still %d available",
+                   s->silk_id, engine->num_free_silk);
+        assert(SILK_STATE(s) == SILK_STATE__FREE);
+        // initialize new silk startup info
+        s->entry_func = entry_func;
+        s->entry_func_arg = entry_func_arg;
+        silk__set_state(s, SILK_STATE__ALLOC);
+        *silk = s;
 
+        silk_stat = SILK_STAT_OK;
+    } else {
+        silk_stat = SILK_STAT_NO_FREE_SILK;
+    }
 
-    s = &engine->silks[silk_id];
-
-    assert(SILK_STATE(s) == SILK_STATE__FREE);
-    s->entry_func = entry_func;
-    s->entry_func_arg = entry_func_arg;
-    silk__set_state(s, SILK_STATE__ALLOC);
-    *silk = s;
-
-    silk_id++;
     pthread_mutex_unlock(&engine->mtx);
     return silk_stat;
 }

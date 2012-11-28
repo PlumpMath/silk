@@ -1,7 +1,7 @@
 Initializing Silk engine...
 DBG :waiting for all BOOT msgs to be processed
-INFO:Thread starting. id=3077933888
 DBG :waiting for all BOOT msgs to be processed
+INFO:Thread starting. id=3078355776
 DBG :Silk#0 booting...
 DBG :Silk#0 processing BOOT msg
 DBG :switching from Silk#0 to Silk#1
@@ -10,23 +10,27 @@ DBG :Silk#1 processing BOOT msg
 DBG :switching from Silk#1 to Silk#2
 DBG :Silk#2 booting...
 DBG :Silk#2 processing BOOT msg
-DBG :switching from Silk#2 to Silk#3
-DBG :Silk#3 booting...
-DBG :Silk#3 processing BOOT msg
 ping pong idle
 DBG :All Silks completed booting !
 Silk initialization returns:0
+DBG :allocated Silk#0. still 2 available
 allocacated silk No 0
 dispatched silk No 0
+DBG :allocated Silk#1. still 1 available
 allocacated silk No 1
 dispatched silk No 1
+DBG :allocated Silk#2. still 0 available
 allocacated silk No 2
 dispatched silk No 2
-DBG :switching from Silk#3 to Silk#0
+DBG :There are 0 free silks now
+DBG :switching from Silk#2 to Silk#0
 DBG :switched into Silk#0
 INFO:silk 0 starting
 ping_pong_entry_func: starts... (arg=0)
 ping_pong_entry_func: stack variable address: &stk_var=0x0xb000ffa8
+DBG :There are 0 free silks now
+DBG :There are 0 free silks now
+DBG :There are 0 free silks now
 ping_pong_entry_func: ends!!!
 INFO:silk 0 ended
 DBG :switching from Silk#0 to Silk#1
@@ -34,6 +38,8 @@ DBG :switched into Silk#1
 INFO:silk 1 starting
 ping_pong_entry_func: starts... (arg=1)
 ping_pong_entry_func: stack variable address: &stk_var=0x0xb0023fa8
+DBG :There are 1 free silks now
+DBG :There are 1 free silks now
 ping_pong_entry_func: ends!!!
 INFO:silk 1 ended
 DBG :switching from Silk#1 to Silk#2
@@ -41,22 +47,32 @@ DBG :switched into Silk#2
 INFO:silk 2 starting
 ping_pong_entry_func: starts... (arg=2)
 ping_pong_entry_func: stack variable address: &stk_var=0x0xb0037fa8
+DBG :There are 2 free silks now
+DBG :There are 2 free silks now
 ping_pong_entry_func: ends!!!
 INFO:silk 2 ended
 ping pong idle
+DBG :There are 3 free silks now
+DBG :There are 3 free silks now
 ping pong idle
+DBG :There are 3 free silks now
+DBG :There are 3 free silks now
 ping pong idle
+DBG :There are 3 free silks now
+DBG :There are 3 free silks now
 ping pong idle
+DBG :There are 3 free silks now
+DBG :There are 3 free silks now
 ping pong idle
+DBG :There are 3 free silks now
+DBG :There are 3 free silks now
 ping pong idle
-ping pong idle
-ping pong idle
-ping pong idle
-ping pong idle
+DBG :There are 3 free silks now
+DBG :There are 3 free silks now
 Silk termination returns:0
 DBG :switching from Silk#2 to Silk#0
 DBG :switched into Silk#0
-INFO:kernel thread 3077933888 processing TERM msg
-INFO:thread 3077933888 switching back to pthread stack
-INFO:Thread exiting. id=3077933888
+INFO:kernel thread 3078355776 processing TERM msg
+INFO:thread 3078355776 switching back to pthread stack
+INFO:Thread exiting. id=3078355776
 Silk join returns:0

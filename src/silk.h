@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <sys/queue.h>
 #include "silk_base.h"
 #include "silk_tls.h"
 #include "silk_sched.h"
@@ -68,7 +69,7 @@ struct silk_engine_param_t {
  * FREE          | silk_alloc()            | ALLOC
  * ALLOC         | process MSG_START       | RUN
  * RUN           | silk__exit()            | TERM
- *               | entry function returns  | TERM
+ *               | entry function returns  | FREE
  * TERM          | process recycle msg     | FREE
  */
 #define SILK_STATE__FIRST   0x0
@@ -89,6 +90,8 @@ struct silk_engine_param_t {
  * a single silk uthread instance
  */
 struct silk_t {
+    // the link-list chaining object
+    SLIST_ENTRY(silk_t)           next_free;
     // the entry function of the silk thread
     silk_uthread_func_t           entry_func;
     // an argument to be passed to the silk entry point
@@ -134,6 +137,11 @@ struct silk_execution_thread_t {
     struct silk_msg_t                  last_msg;
 };
 
+/*
+ * definitions for BSD based linked list of silks (struct silk_t)
+*/
+SLIST_HEAD(silk_head_t, silk_t);
+
  
 /*
  * A processing engine with a single thread
@@ -151,6 +159,8 @@ struct silk_engine_t {
     struct silk_t                          *silks;
     // the configuration we started with
     struct silk_engine_param_t             cfg;
+    // a list of free silk objects
+    struct silk_head_t                     free_silks;
     // indicate when the thread should terminate itself.
     bool                                   terminate;
     // The number of Silks in free state

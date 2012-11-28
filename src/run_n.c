@@ -3,6 +3,8 @@
  *
  * A small test program to dispatch N silks & watch their context switching.
  * This means for initial development of the library & basic sanity further on.
+ * it also shows how the number of free silks decreases due to their 
+ * allocation & increases when they terminate.
  */
 
 #include <stdlib.h>
@@ -34,6 +36,7 @@ ping_pong_entry_func (void *_arg)
     
     printf("%s: starts... (arg=%d)\n", __func__, arg);
     printf("%s: stack variable address: &stk_var=0x%p\n", __func__, &stk_var);
+    usleep(1100 * 1000);
     printf("%s: ends!!!\n", __func__);
 }
 
@@ -58,7 +61,7 @@ int main (int   argc, char **argv)
     struct silk_engine_t   engine;
     struct silk_t          *s;
     enum silk_status_e     silk_stat;
-    int    num_silk = 3;//TODO: get this from user CLI
+    int    num_silk = 3;
     int    i;
 
  
@@ -69,13 +72,10 @@ int main (int   argc, char **argv)
             exit(EINVAL);
         }
     }
-    if (num_silk > silk_cfg.num_silk) {
-        printf("Requested # of Silks exceeds the available pool\n");
-        exit(EINVAL);
-    }
 
 
     printf("Initializing Silk engine...\n");
+    silk_cfg.num_silk = num_silk;
     silk_stat = silk_init(&engine, &silk_cfg);
     printf("Silk initialization returns:%d\n", silk_stat);
     for (i=0; i < num_silk; i++) {
@@ -86,7 +86,10 @@ int main (int   argc, char **argv)
         assert(silk_stat == SILK_STAT_OK);
         printf("dispatched silk No %d\n", s->silk_id);
     }
-    sleep(10);
+    for (i=0; i < 2*10; i++) {
+        usleep(500*1000);
+        SILK_DEBUG("There are %d free silks now", engine.num_free_silk);
+    }
     silk_stat = silk_terminate(&engine);
     printf("Silk termination returns:%d\n", silk_stat);
     silk_stat = silk_join(&engine);
