@@ -203,16 +203,57 @@ silk_id_t silk__my_id()
 }
 
 /*
+ * returns the control-object for the silk making the call.
+*/
+static inline struct silk_t *
+silk__my_ctrl()
+{
+    struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
+    struct silk_engine_t           *engine = exec_thr->engine;
+    const silk_id_t                 my_silk_id = silk__my_id();
+    return &engine->silks[my_silk_id];
+}
+/*
  * This API allows the scheduler to take the calling Silk out-of-execution & switch 
  * to another silk instance. the specifics of such a decision is scheduler-specific.
  * When the function returns, the msg which awoke the silk is returned so it can be 
  * processed
 */
-void silk_yield(struct silk_msg_t   *msg)
+//TODO: make this return "void"!!!
+bool silk_yield(struct silk_msg_t   *msg)
 {
-    //struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
-    //TODO: move the scratch msg to the thread object so it exists per thread per engine
+    struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
+    struct silk_engine_t           *engine = exec_thr->engine;
+    struct silk_t                  *s = silk__my_ctrl();
+    struct silk_t                  *silk_trgt;
+    silk_id_t                       msg_silk_id;
+    
 
+    // retrieve the next msg (based on priorities & any other application
+    // specific rule) to be processed.
+    if (silk_sched_get_next(&exec_thr->engine->msg_sched, &exec_thr->last_msg)) {
+        /*
+         * swap context into the silk which received the msg.
+         * BEWARE: 
+         * 1) 's' was set in previous loop iteration & hence it has the older silk 
+         * object, which executed the last msg
+         * 2) we must  optimize the case where we can skip switching from one instance to itself.
+         * otherwise, we'll send the "current" stack-pointer as target & save a 
+         * stack-pointer which is pushed into while saving the state. it will cause
+         * us to return on the stack as if "before" we saved the state. very bad !!!
+         */
+        msg_silk_id = exec_thr->last_msg.silk_id;
+        if (likely(s->silk_id != msg_silk_id)) {
+            silk_trgt = &engine->silks[msg_silk_id];
+            assert(silk_trgt->silk_id == msg_silk_id);
+            SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
+            SILK_SWITCH(silk_trgt, s);
+            SILK_DEBUG("switched into Silk#%d", s->silk_id);
+        }
+        memcpy(msg, &exec_thr->last_msg, sizeof(*msg));
+        return true;
+    }
+    return false;
 }
 
 #endif // __SILK_H__

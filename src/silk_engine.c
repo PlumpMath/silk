@@ -30,47 +30,25 @@ static void silk__main (void) /*__attribute__((no_return))*/
 {
     struct silk_execution_thread_t         *exec_thr = silk__my_thread_obj();
     struct silk_engine_t                   *engine = exec_thr->engine;
-    /*
-     * BEWARE: this pointer is just a syntactic-sugar. its a stack variable which 
-     * points to a single msg instance used by ALL silks of this engine !!!
-     */
-    const struct silk_msg_t                *m = &exec_thr->last_msg;
+    struct silk_msg_t       _m;// TODO: change to msg
     const silk_id_t         my_silk_id = silk__my_id();
-    struct silk_t           *s = &engine->silks[my_silk_id/*SILK_INITIAL_ID*/];
-    struct silk_t           *silk_trgt;
+    struct silk_t           *s = &engine->silks[my_silk_id];//TODO: change to use: silk__my_ctrl()
 
 
     SILK_DEBUG("Silk#%d booting...", s->silk_id);
     assert(SILK_STATE(s) == SILK_STATE__BOOT);
-    silk__set_state(s, SILK_STATE__FREE);
     do {
-        // retrieve the next msg (based on priorities & any other application
-        // specific rule) to be processed.
-        if (silk_sched_get_next(&exec_thr->engine->msg_sched, &exec_thr->last_msg)) {
-            /*
-             * swap context into the silk which received the msg.
-             * BEWARE: 
-             * 1) 's' was set in previous loop iteration & hence it has the older silk 
-             * object, which executed the last msg
-             * 2) we must  optimize the case where we can skip switching from one instance to itself.
-             * otherwise, we'll send the "current" stack-pointer as target & save a 
-             * stack-pointer which is pushed into while saving the state. it will cause
-             * us to return on the stack as if "before" we saved the state. very bad !!!
-             */
-            if (likely(s->silk_id != m->silk_id)) {
-                silk_trgt = &engine->silks[m->silk_id];
-                assert(silk_trgt->silk_id == m->silk_id);
-                SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
-                SILK_SWITCH(silk_trgt, s);
-                SILK_DEBUG("switching control into Silk#%d", s->silk_id);
-            }
-            switch (m->msg) {
+        //TODO: need to remove return value
+        if (silk_yield(&_m)) {
+            switch (_m.msg) {
             case SILK_MSG_BOOT:
                 SILK_DEBUG("Silk#%d processing BOOT msg", s->silk_id);
+                assert(SILK_STATE(s) == SILK_STATE__BOOT);
+                silk__set_state(s, SILK_STATE__FREE);
                 break;
 
             case SILK_MSG_START:
-                s = silk_get_ctrl_from_id(engine, m->silk_id);
+                s = silk_get_ctrl_from_id(engine, _m.silk_id);
                 assert(SILK_STATE(s) == SILK_STATE__ALLOC);
                 SILK_INFO("silk %d starting", silk__my_id());
                 silk__set_state(s, SILK_STATE__RUN);
@@ -82,7 +60,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
 
             case SILK_MSG_TERM:
                 SILK_INFO("silk thread %lu:%d processing TERM msg", 
-                          exec_thr->id, m->silk_id);
+                          exec_thr->id, _m.silk_id);
                 /*
                  * BEWARE: we push the silk on which we currently execute to the free list.
                  * This is OK as long as the addition of the silk to the free list is
@@ -304,9 +282,27 @@ silk_init (struct silk_engine_t               *engine,
                                           silk__main,
                                           addr,//silk_get_stack_from_id(engine, msg.silk_id),
                                           SILK_USEABLE_STACK(&engine->cfg));
+        /*
+         * ask each silk to boot into the place they all wait for msgs
+         * The first msg causes the scheduler to switch into it. it then runs from the 
+         * beggining os silk__main() up to the first silk_yield() where it joins all
+         * silks awaiting control msgs. however, the msg itself wasnt processed bcz
+         * it was lost when we switched into silk_main() which isnt built to retrieve
+         * the msg which cause the context-switch into it.
+         * the second msg is received by each silk instance & causes it to return from
+         * the call to silk_yield(). this one is required only bcz the silk instance
+         * state-machine requires a BOOT msg in order to change its state to FREE.
+         * The second msg isnt sent to the INITIAL silk bcz this one executed its part
+         * from silk_main() to silk_yield() as part of the pthread initialization. the
+         * pthread switches into the INITIAL silk & this allows it to run up to the 
+         * call to silk_yield().
+         */
         ret = silk_send_msg_code(engine, SILK_MSG_BOOT, s->silk_id);
-        // ask each silk to boot into the place they all wait for msgs
         assert(ret == SILK_STAT_OK);
+        if (i != SILK_INITIAL_ID) {
+            ret = silk_send_msg_code(engine, SILK_MSG_BOOT, s->silk_id);
+            assert(ret == SILK_STAT_OK);
+        }
     }
     
     // let the thread execution start
@@ -318,7 +314,7 @@ silk_init (struct silk_engine_t               *engine,
     // wait until all BOOT msgs are processed.
     while (!silk_sched_is_empty(&engine->msg_sched)) {
         SILK_DEBUG("waiting for all BOOT msgs to be processed");
-        usleep(1);
+        usleep(10);
     }
     SILK_DEBUG("All Silks completed booting !");
 
