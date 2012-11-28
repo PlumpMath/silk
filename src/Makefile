@@ -9,7 +9,7 @@ samples: $(SRC) *.h
 	gcc $(LFLAGS) silk_engine.o silk_context.o -o silk $(LIBS)
 
 clean:
-	rm -f *.o core silk
+	rm -f *.o core silk TAGS
 # .PHONY
 TAGS:
 	etags --output=TAGS *.c *.h

@@ -13,64 +13,10 @@
  
 
 
-
 /*
- * Information related to the Silk engine thread (e.g.: pthread, etc) which is used to actually execute the micro-threads
+ * This is the Silk ID of the instance which is used to start running when the engine comes up
  */
-struct silk_execution_thread_t {
-    // The silk processing instance that this thread serves
-    struct silk_engine_t               *engine;
-    // The pthread ID that is used as our execution engine
-    pthread_t                          id;
-    /*
-     * The silk context maintained for the pthread, when we switch from
-     * the pthread to the first silk. we'll use it back only when we terminate
-     * the engine, when the processing thread needs to terminate
-     */
-    struct silk_exec_state_t           exec_state;
-};
-
- 
-/*
- * A processing engine with a single thread
- */
-struct silk_engine_t {
-    // a mutex to guard access to engine state
-    pthread_mutex_t                        mtx;
-    // the thread which actually runs all silks
-    struct silk_execution_thread_t         exec_thr;
-    // msgs which are pending processing
-    struct silk_incoming_msg_queue_t       msg_sched;
-    // the memory area used as stack for the uthreads
-    void                                   *stack_addr;
-    // the state of each silk instance, inc. the context-switch
-    struct silk_t                          *silks;
-    // the configuration we started with
-    struct silk_engine_param_t             cfg;
-    // indicate when the thread should terminate itself.
-    bool                                   terminate;
-};
-
-
-// verify that a silk ID is valid.
-#define SILK_ASSERT_ID(engine, silk_id)   assert((silk_id) < (engine)->cfg.num_silk)
-
-static inline void *
-silk_get_stack_from_id(struct silk_engine_t   *engine,
-                       silk_id_t              silk_id)
-{
-    SILK_ASSERT_ID(engine, silk_id);
-    return engine->stack_addr + silk_id * SILK_PADDED_STACK(&engine->cfg);
-}
-
-static inline struct silk_t *
-silk_get_ctrl_from_id(struct silk_engine_t   *engine,
-                      silk_id_t              silk_id)
-{
-    SILK_ASSERT_ID(engine, silk_id);
-    return engine->silks + silk_id;
-}
-
+#define SILK_INITIAL_ID   0
 
 /*
  * This is the internal entry function of all silks.
@@ -78,12 +24,14 @@ silk_get_ctrl_from_id(struct silk_engine_t   *engine,
  * Note:
  * The function prototype MUST be maintained the same as the function that switches context bcz we start this function by "switching context" into it. DO WE REALLY NEED IT SO ?????
  */
-static void silk__main () /*__attribute__((no_return))*/
+static void silk__main (void) /*__attribute__((no_return))*/
 {
     struct silk_execution_thread_t         *exec_thr = silk__my_thread_obj();
     struct silk_engine_t                   *engine = exec_thr->engine;
     struct silk_msg_t       msg;
-    struct silk_t           *s;
+    const silk_id_t         my_silk_id = silk__my_id();
+    struct silk_t           *s = &engine->silks[my_silk_id/*SILK_INITIAL_ID*/];
+    struct silk_t           *silk_trgt;
 
 
     printf("%s: i'm here :)\n", __func__);
@@ -91,12 +39,42 @@ static void silk__main () /*__attribute__((no_return))*/
         // retrieve the next msg (based on priorities & any other application
         // specific rule) to be processed.
         if (silk_sched_get_next(&exec_thr->engine->msg_sched, &msg)) {
+            /*
+             * swap context into the silk which received the msg.
+             * BEWARE: 
+             * 1) 's' was set in previous loop iteration & hence it has the older silk 
+             * object, which executed the last msg
+             * 2) we must  optimize the case where we can skip switching from one instance to itself.
+             * otherwise, we'll send the "current" stack-pointer as target & save a 
+             * stack-pointer which is pushed into while saving the state. it will cause
+             * us to return on the stack as if "before" we saved the state. very bad !!!
+             */
+            if (likely(s->silk_id != msg.silk_id)) {
+                silk_trgt = &engine->silks[msg.silk_id];
+                assert(silk_trgt->silk_id == msg.silk_id);
+                SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
+#if 1
+                SILK_SWITCH(silk_trgt, s);
+#else
+#if defined (__i386__)
+                silk_swap_stack_context(silk_trgt->exec_state.esp, &s->exec_state.esp);
+#elif defined (__x86_64__)
+#error "not implemented"
+                // it should be of the form:
+                silk_swap_stack_context(silk_trgt->exec_state, &s->exec_state);
+#endif
+#endif
+                SILK_DEBUG("switching control into Silk#%d", s->silk_id);
+            }
             switch (msg.msg) {
             case SILK_MSG_START:
                 s = silk_get_ctrl_from_id(engine, msg.silk_id);
                 assert(SILK_STATE(s) == SILK_STATE__ALLOC);
                 SILK_INFO("silk %d starting", silk__my_id());
-                s->entry_func();
+                silk__set_state(s, SILK_STATE__RUN);
+                s->entry_func(s->entry_func_arg);
+                assert(SILK_STATE(s) == SILK_STATE__RUN);
+                silk__set_state(s, SILK_STATE__TERM);
                 SILK_INFO("silk %d ended", silk__my_id());
                 break;
 
@@ -145,7 +123,7 @@ static void *silk__thread_entry(void *ctx)
     struct silk_execution_thread_t         *exec_thr = (struct silk_execution_thread_t*)ctx;
     struct silk_engine_t                   *engine = exec_thr->engine;
     struct silk_t       *s;
-    silk_id_t           silk_id = 0; // the silk we'll start to run on.
+    const silk_id_t      silk_id = SILK_INITIAL_ID; // the silk we'll start to run on.
 
 
     SILK_INFO("Thread starting. id=%lu", exec_thr->id);
@@ -238,7 +216,7 @@ silk_eng_join (struct silk_execution_thread_t                    *exec_thr)
 
 enum silk_status_e
 silk_init (struct silk_engine_t               *engine,
-	   const struct silk_engine_param_t   *param)
+           const struct silk_engine_param_t   *param)
 {
     enum silk_status_e     ret;
     size_t                 stack_size;
@@ -305,6 +283,11 @@ silk_init (struct silk_engine_t               *engine,
     if (engine->silks == NULL) {
         ret = SILK_STAT_ALLOC_FAIL;
         goto silk_state_alloc_fail;
+    }
+    // initialize per silk control information
+    for (i=0; i < param->num_silk; i++) {
+        silk__set_state(&engine->silks[i], SILK_STATE__FREE);
+        engine->silks[i].silk_id = i;
     }
 
     // initialize the msg queue object
@@ -391,29 +374,62 @@ silk_join(struct silk_engine_t   *engine)
 
 /*
  * allocate a silk instance to schedule new work
+ *
+ * Input
+ * engine - the engine from which the silk is allocated & to which it is posted for execution.
+ * entry_func - the function that will be executed by the silk instance.
+ * ctx - a value that will be passed on to the entry_func (just like in pthread_create())
+ *
+ * Ouput
+ * silk - the silk instance that was allocated.
  */ 
 enum silk_status_e
 silk_alloc(struct silk_engine_t   *engine,
-           silk_uthread_func_t    entry_func)
+           silk_uthread_func_t    entry_func,
+           void                   *entry_func_arg,
+           struct silk_t        **silk)
 {
     pthread_mutex_lock(&engine->mtx);
     // TODO: alloc a Silk instance
     static int silk_id = 0;
+    struct silk_t  *s;
     enum silk_status_e   silk_stat;
 
-    assert(silk_id < engine->cfg.num_silk);
 
-    struct silk_t  *s;
+    // TODO: for now were sure we have a free silk :)
+    assert(silk_id < engine->cfg.num_silk);
+    silk_stat = SILK_STAT_OK;
+
 
     s = &engine->silks[silk_id];
+
+    assert(SILK_STATE(s) == SILK_STATE__FREE);
     s->entry_func = entry_func;
+    s->entry_func_arg = entry_func_arg;
     silk__set_state(s, SILK_STATE__ALLOC);
-    silk_stat = silk_send_msg_code(engine, SILK_MSG_START, silk_id);
+    *silk = s;
 
     silk_id++;
     pthread_mutex_unlock(&engine->mtx);
     return silk_stat;
 }
+
+/*
+ * dispatches an allocated silk to start running. the actual execution depends on the scheduler.
+*/
+enum silk_status_e
+silk_dispatch(struct silk_engine_t   *engine,
+              struct silk_t          *s)
+{
+    enum silk_status_e   silk_stat;
+
+    assert(SILK_STATE(s) == SILK_STATE__ALLOC);
+    silk_stat = silk_send_msg_code(engine, SILK_MSG_START, s->silk_id);
+
+    return silk_stat;
+}
+
+
 
 /*
  * a ping pong example to measure performance of silk scheduling.
@@ -432,12 +448,14 @@ ping_pong_idle_cb (struct silk_execution_thread_t   *exec_thr)
 }
 
 static void
-ping_pong_entry_func (void)
+ping_pong_entry_func (void *_arg)
 {
+    int arg = (int)_arg;
     int i;
     
-    printf("%s: starts...\n", __func__);
+    printf("%s: starts... (arg=%d)\n", __func__, arg);
     printf("%s: &i=0x%p\n", __func__, &i);
+    sleep(2);
     printf("%s: ends!!!\n", __func__);
 }
 
@@ -445,7 +463,7 @@ int main (int   argc, char **argv)
 {
     struct silk_engine_param_t    silk_param = {
         .flags = 0,
-        // TODO: make it possible to select an address!!!
+        // it's possible to select an address or let the library choose
         //.stack_addr = (void*)NULL,
         .stack_addr = (void*)0xb0000000,
         .num_stack_pages = 16,
@@ -455,14 +473,24 @@ int main (int   argc, char **argv)
         .ctx = NULL,
     };
     struct silk_engine_t   engine;
+    struct silk_t          *s;
     enum silk_status_e     silk_stat;
+   int num_silk = 2;//TODO: get this from user CLI
+    int    i;
 
  
 
     printf("Initializing Silk engine...\n");
     silk_stat = silk_init(&engine, &silk_param);
     printf("Silk initialization returns:%d\n", silk_stat);
-    silk_stat = silk_alloc(&engine, ping_pong_entry_func);
+    for (i=0; i < num_silk; i++) {
+        silk_stat = silk_alloc(&engine, ping_pong_entry_func, (void*)i, &s);
+        assert(silk_stat == SILK_STAT_OK);
+        printf("allocacated silk No %d\n", s->silk_id);
+        silk_stat = silk_dispatch(&engine, s);
+        assert(silk_stat == SILK_STAT_OK);
+        printf("dispatched silk No %d\n", s->silk_id);
+    }
     sleep(10);
     silk_stat = silk_terminate(&engine);
     printf("Silk termination returns:%d\n", silk_stat);

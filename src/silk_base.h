@@ -20,6 +20,7 @@
 #define SILK_ERROR(fmt, ...)   printf("ERR :" fmt "\n", ## __VA_ARGS__)
 #define SILK_WARN(fmt, ...)    printf("WARN:" fmt "\n", ## __VA_ARGS__)
 #define SILK_INFO(fmt, ...)    printf("INFO:" fmt "\n", ## __VA_ARGS__)
+#define SILK_DEBUG(fmt, ...)   printf("DBG :" fmt "\n", ## __VA_ARGS__)
 
 #define PAGE_SIZE    (4*1024)
 
@@ -68,6 +69,10 @@ enum __attribute__((packed)) silk_msg_code_e {
     SILK_MSG_APP_CODE_FIRST = 1000,
 };
 
+/*
+ * a unique integer identifying the silk instance.
+ */
+typedef uint16_t   silk_id_t;
 
 /*
  * encapsulate a message that is sent to a silk micro-thread
@@ -77,7 +82,7 @@ struct silk_msg_t {
   // additional information that the sender attached to the msg
   void*                       ctx;
   // the index into the uthread array identifying the target uthread to process this message
-  uint16_t                    silk_id;
+  silk_id_t                   silk_id;
     // TODO: we need a generation in which the msg was sent so that a silk wont process a msg from its previous lifetime. (so genenation counter per silk_t)
   enum silk_msg_code_e        msg;
 };

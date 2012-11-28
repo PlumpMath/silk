@@ -25,9 +25,25 @@
 
 
 /*
+ * This macto (it cannot be an inline function) causes a context switch between two 
+ * __DIFFERENT__ silk instances.
+ * Input:
+ * to   - this is the "struct silk_t" of the instance we switch into
+ * from - this is the "struct silk_t" of the instance we switch out-of
+ */
+#if defined (__i386__)
+#define SILK_SWITCH(to, from)  silk_swap_stack_context((to)->exec_state.esp, &((from)->exec_state.esp));
+#elif defined (__x86_64__)
+#error "not implemented"
+// it should be of the form:
+#define SILK_SWITCH(to, from)  silk_swap_stack_context((to)->exec_state, &((from)->exec_state));
+#endif
+
+
+/*
  * The silk micro-thread instance start routine.
  */
-typedef void (*silk_uthread_func_t) (void);
+typedef void (*silk_uthread_func_t) (void *_arg);
 
 
 #if defined (SILK_CONTEXT__LIBC)
@@ -65,7 +81,7 @@ struct silk_exec_state_t {
  * size - the size (in bytes) of the stack buffer.
  */
 void silk_create_initial_stack_context(struct silk_exec_state_t *initial_ctx,
-                                       silk_uthread_func_t start_func,
+                                       void    (*start_func) (void),
                                        char     *stack_buf,
                                        size_t    size);
 

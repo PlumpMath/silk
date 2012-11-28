@@ -23,10 +23,6 @@ struct silk_execution_thread_t;
 struct silk_engine_t;
 
 
-/*
- * a unique integer identifying the silk instance.
- */
-typedef uint32_t   silk_id_t;
 
  
 /*
@@ -76,6 +72,7 @@ struct silk_engine_param_t {
 #define SILK_STATE__FIRST   0x0
 #define SILK_STATE__FREE    0x0 // free for anyone to allocate
 #define SILK_STATE__ALLOC   0x1 // allocated but hasnt started running yet
+// do we need SILK_STATE_IGNITE ?
 #define SILK_STATE__RUN     0x2 // running, not terminated/exited yet
 #define SILK_STATE__TERM    0x3 // terminated, pending recycle to make it FREE
 #define SILK_STATE__LAST    0x3
@@ -91,6 +88,8 @@ struct silk_engine_param_t {
 struct silk_t {
     // the entry function of the silk thread
     silk_uthread_func_t           entry_func;
+    // an argument to be passed to the silk entry point
+    void                         *entry_func_arg;
     // the context saved during the last run.
     struct silk_exec_state_t      exec_state;
     // The silk processing instance that this thread serves
@@ -100,6 +99,8 @@ struct silk_t {
      * 2 bits : current state of silk object
      */
     uint32_t                      state;
+    // the unique silk_id of this instance
+    silk_id_t                     silk_id;
 };
 
 static inline void 
@@ -111,17 +112,90 @@ silk__set_state(struct silk_t   *s,
 }
 
 
+/*
+ * Information related to the Silk engine thread (e.g.: pthread, etc) which is used to 
+ * actually execute the micro-threads
+ */
+struct silk_execution_thread_t {
+    // The silk processing instance that this thread serves
+    struct silk_engine_t               *engine;
+    // The pthread ID that is used as our execution engine
+    pthread_t                          id;
+    /*
+     * The silk context maintained for the pthread, when we switch from
+     * the pthread to the first silk. we'll use it back only when we terminate
+     * the engine, when the processing thread needs to terminate
+     */
+    struct silk_exec_state_t           exec_state;
+};
+
+ 
+/*
+ * A processing engine with a single thread
+ */
+struct silk_engine_t {
+    // a mutex to guard access to engine state
+    pthread_mutex_t                        mtx;
+    // the thread which actually runs all silks
+    struct silk_execution_thread_t         exec_thr;
+    // msgs which are pending processing
+    struct silk_incoming_msg_queue_t       msg_sched;
+    // the memory area used as stack for the uthreads
+    void                                   *stack_addr;
+    // the state of each silk instance, inc. the context-switch
+    struct silk_t                          *silks;
+    // the configuration we started with
+    struct silk_engine_param_t             cfg;
+    // indicate when the thread should terminate itself.
+    bool                                   terminate;
+};
+
+// verify that a silk ID is valid.
+#define SILK_ASSERT_ID(engine, silk_id)   assert((silk_id) < (engine)->cfg.num_silk)
+
+static inline void *
+silk_get_stack_from_id(struct silk_engine_t   *engine,
+                       silk_id_t              silk_id)
+{
+    SILK_ASSERT_ID(engine, silk_id);
+    return engine->stack_addr + silk_id * SILK_PADDED_STACK(&engine->cfg);
+}
+
+static inline struct silk_t *
+silk_get_ctrl_from_id(struct silk_engine_t   *engine,
+                      silk_id_t              silk_id)
+{
+    SILK_ASSERT_ID(engine, silk_id);
+    return engine->silks + silk_id;
+}
+
+
+
+
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
 
 /*
  * returns the silk id of the caller
+ * we use the stack address to find the silk instance
+ * TODO: test this API. just write a program to allocate all silks & execute each to verify its own ID
  */
 silk_id_t silk__my_id()
 {
-    // TODO: implement this based on TLS of engine object
-    return 0;
+    struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
+    struct silk_engine_t           *engine = exec_thr->engine;
+    uintptr_t   stk_start = (uintptr_t)engine->stack_addr;
+    size_t      stack_size = SILK_PADDED_STACK(&engine->cfg) * engine->cfg.num_silk;
+    uintptr_t   stk_end = (uintptr_t)(engine->stack_addr) + stack_size;
+    // take the address of any stack variable
+    uintptr_t   stk_addr = (uintptr_t)&engine;
+    silk_id_t   silk_id;
+
+
+    assert((stk_addr >= stk_start) && (stk_addr < stk_end));
+    silk_id = (stk_addr - stk_start) / SILK_PADDED_STACK(&engine->cfg);
+    return silk_id;
 }
 
 #endif // __SILK_H__

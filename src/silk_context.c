@@ -54,7 +54,7 @@ silk_swap_stack_context(void***, void**) __attribute__((regparm(2)))
 
 
 void silk_create_initial_stack_context(struct silk_exec_state_t *initial_ctx,
-                                       silk_uthread_func_t start_func,
+                                       void    (*start_func) (void),
                                        char     *stack_buf,
                                        size_t    size)
 {

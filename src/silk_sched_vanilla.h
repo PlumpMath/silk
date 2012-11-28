@@ -121,7 +121,7 @@ silk_sched_is_full(struct silk_incoming_msg_queue_t      *q)
  */
 enum silk_status_e
 silk_sched_send(struct silk_incoming_msg_queue_t      *q,
-		struct silk_msg_t                     *msg)
+                struct silk_msg_t                     *msg)
 {
     enum silk_status_e   silk_stat;
 
