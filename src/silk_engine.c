@@ -1,5 +1,4 @@
 /*
- * the context that is saved for a silk uthread when it is swapped-out.
  * Copyight (C) Eitan Ben-Amos, 2012
  */
 
@@ -9,88 +8,13 @@
 #include <errno.h>
 #define __USE_MISC
 #include <sys/mman.h>
-
-
 #include "silk.h"
  
 
 
-enum silk_status_e
-silk_msg_init(struct silk_incoming_msg_queue_t      *q)
-{
-    q->next_write = 0;
-    q->next_read = 0;
-    memset(q->msgs, 0, sizeof(q->msgs));
-    return SILK_STAT_OK;
-}
 
-enum silk_status_e
-silk_msg_terminate(struct silk_incoming_msg_queue_t      *q)
-{
-    return SILK_STAT_OK;
-}
 
-/*
- * move the index into the next slot
- */
-static inline uint32_t
-silk_msg_next_index(uint32_t       index)
-{
-    assert(index < MSG_QUEUE_SIZE);
-    index ++;
-    if (index == MSG_QUEUE_SIZE)
-	index = 0;
-    return index;
-}
-static inline bool
-silk_msg_is_empty(struct silk_incoming_msg_queue_t      *q)
-{
-    if (q->next_write == q->next_read) {
-	return true;
-    } else {
-	return false;
-    }
-}
-static inline bool
-silk_msg_is_full(struct silk_incoming_msg_queue_t      *q)
-{
-    if (silk_msg_next_index(q->next_write) == q->next_read) {
-	return true;
-    } else {
-	return false;
-    }
-}
-/*
- * if queue isnt full, write the msg into the tail of the queue
- * internal Silk library API, for engine layer only
- */
-enum silk_status_e
-silk_msg_send(struct silk_incoming_msg_queue_t      *q,
-	      struct cilk_msg_t                     *msg)
-{
-    if (silk_msg_is_full(q)) {
-	return SILK_STAT_Q_FULL;
-    }
-    q->msgs[q->next_write] = *msg;
-    q->next_write++;
-    return SILK_STAT_OK;
-}
 
-/*
- * fetch the next msg to be processed, based on the scheduler scheduling decision
- * This is the place to implement various scheduling policies such as priority queue, etc
- * return true when a msg is returned, false otherwise
- */
-bool silk_msg_get_next(struct silk_incoming_msg_queue_t      *q,
-		       struct cilk_msg_t                     *msg)
-{
-    if (silk_msg_is_empty(q)) {
-	return false;
-    }
-    *msg = q->msgs[q->next_read];    
-    q->next_read = silk_msg_next_index(q->next_read);
-    return true;
-}
 
 /*
  * Information related to the Silk engine thread (e.g.: pthread, etc) which is used to actually execute the micro-threads
@@ -162,13 +86,13 @@ static void *silk_thread_entry(void *ctx)
 {
     struct silk_execution_thread_t         *exec_thr = (struct silk_execution_thread_t*)ctx;
     struct silk_engine_t                   *engine = exec_thr->engine;
-    struct cilk_msg_t                      msg;
+    struct silk_msg_t                      msg;
 
     do {
 	// retrieve the next msg (based on priorities & any other application
 	// specific rule) to be processed.
-	if (silk_msg_get_next(&exec_thr->engine->msg_sched, &msg)) {
-	    if (unlikely(msg.msg == SILK_TERM)) {
+	if (silk_sched_get_next(&exec_thr->engine->msg_sched, &msg)) {
+	    if (unlikely(msg.msg == SILK_MSG_TERM)) {
 		SILK_INFO("thread %lu processing TERM msg", exec_thr->id);
 		exec_thr->terminate = true;
 	    } else {
@@ -205,11 +129,11 @@ silk_thread_init (struct silk_execution_thread_t        *exec_thr,
  */
 static inline enum silk_status_e
 silk_send_msg (struct silk_engine_t                  *engine,
-	       struct cilk_msg_t                     *msg)
+	       struct silk_msg_t                     *msg)
 {
     enum silk_status_e    silk_stat;
 
-    silk_stat = silk_msg_send(&engine->msg_sched, msg);
+    silk_stat = silk_sched_send(&engine->msg_sched, msg);
     return silk_stat;
 }
 
@@ -221,7 +145,7 @@ silk_send_msg_code (struct silk_engine_t                  *engine,
 		    enum silk_msg_code_e                  msg_code,
 		    uint32_t                              silk_id)
 {
-    struct cilk_msg_t        msg = {
+    struct silk_msg_t        msg = {
 	.msg = msg_code,
 	.silk_id = silk_id,
     };
@@ -231,7 +155,7 @@ silk_send_msg_code (struct silk_engine_t                  *engine,
 static inline enum silk_status_e
 silk_eng_terminate (struct silk_execution_thread_t       *exec_thr)
 {
-    return silk_send_msg_code(exec_thr->engine, SILK_TERM, 0/* doesnt matter - its for the engine itself*/);
+    return silk_send_msg_code(exec_thr->engine, SILK_MSG_TERM, 0/* doesnt matter - its for the engine itself*/);
 }
  
 
@@ -306,7 +230,7 @@ silk_init (struct silk_engine_t               *engine,
     }
 
     // initialize the msg queue object
-    ret = silk_msg_init(&engine->msg_sched);
+    ret = silk_sched_init(&engine->msg_sched);
     if (ret != SILK_STAT_OK) {
 	goto msg_q_init_fail;
     }
@@ -320,7 +244,7 @@ silk_init (struct silk_engine_t               *engine,
     return SILK_STAT_OK;
 
  thread_init_fail:
-    silk_msg_terminate(&engine->msg_sched);
+    silk_sched_terminate(&engine->msg_sched);
  msg_q_init_fail:
  stack_prot_fail:
     rc = munmap(param->stack_addr, stack_size);
