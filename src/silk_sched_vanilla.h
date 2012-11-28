@@ -146,14 +146,14 @@ silk_sched_send(struct silk_incoming_msg_queue_t      *q,
  * return true when a msg is returned, false otherwise
  */
 bool silk_sched_get_next(struct silk_incoming_msg_queue_t      *q,
-			 struct silk_msg_t                     *msg)
+                         struct silk_msg_t                     *msg)
 {
     bool ret;
 
     pthread_mutex_lock(&q->mtx);
     if (_silk_sched_is_empty(q)) {
-	ret = false;
-	goto out;
+        ret = false;
+        goto out;
     }
     *msg = q->msgs[q->next_read];    
     q->next_read = silk_sched_next_index(q->next_read);

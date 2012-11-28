@@ -59,11 +59,12 @@ enum silk_status_e {
  * the message codes we can send to uthreads. A single byte should usually be enough.
  */
 enum __attribute__((packed)) silk_msg_code_e {
-    SILK_MSG_INVALID = 0,       // don’t use 0 as it might be easily caused by non-initialized stuff
-    SILK_MSG_START,               // instruct the uthread to start running.
-    SILK_MSG_TERM,                // instructs the uthread to terminate
-    SILK_MSG_TERM_THREAD,         // instructs the kernel thread to terminate (in preparation for processing halt)
-    SILK_MSG_CODE_LAST,       // the last valid of msg codes used by the Silk library.
+    SILK_MSG_INVALID = 0,    // don’t use 0 as it might be easily caused by non-initialized stuff
+    SILK_MSG_BOOT,           // instruct the silk instance to run to the point it starts processing msgs
+    SILK_MSG_START,          // instruct the uthread to start running.
+    SILK_MSG_TERM,           // instructs the uthread to terminate
+    SILK_MSG_TERM_THREAD,    // instructs the kernel thread to terminate (in preparation for processing halt)
+    SILK_MSG_CODE_LAST,      // the last valid of msg codes used by the Silk library.
 
     // msg code range available for the application that uses the Silk library
     SILK_MSG_APP_CODE_FIRST = 1000,

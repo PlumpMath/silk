@@ -34,7 +34,9 @@ static void silk__main (void) /*__attribute__((no_return))*/
     struct silk_t           *silk_trgt;
 
 
-    printf("%s: i'm here :)\n", __func__);
+    SILK_DEBUG("Silk#%d booting...", s->silk_id);
+    assert(SILK_STATE(s) == SILK_STATE__BOOT);
+    silk__set_state(s, SILK_STATE__FREE);
     do {
         // retrieve the next msg (based on priorities & any other application
         // specific rule) to be processed.
@@ -53,20 +55,14 @@ static void silk__main (void) /*__attribute__((no_return))*/
                 silk_trgt = &engine->silks[msg.silk_id];
                 assert(silk_trgt->silk_id == msg.silk_id);
                 SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
-#if 1
                 SILK_SWITCH(silk_trgt, s);
-#else
-#if defined (__i386__)
-                silk_swap_stack_context(silk_trgt->exec_state.esp, &s->exec_state.esp);
-#elif defined (__x86_64__)
-#error "not implemented"
-                // it should be of the form:
-                silk_swap_stack_context(silk_trgt->exec_state, &s->exec_state);
-#endif
-#endif
                 SILK_DEBUG("switching control into Silk#%d", s->silk_id);
             }
             switch (msg.msg) {
+            case SILK_MSG_BOOT:
+                SILK_DEBUG("Silk#%d processing BOOT msg", s->silk_id);
+                break;
+
             case SILK_MSG_START:
                 s = silk_get_ctrl_from_id(engine, msg.silk_id);
                 assert(SILK_STATE(s) == SILK_STATE__ALLOC);
@@ -284,11 +280,6 @@ silk_init (struct silk_engine_t               *engine,
         ret = SILK_STAT_ALLOC_FAIL;
         goto silk_state_alloc_fail;
     }
-    // initialize per silk control information
-    for (i=0; i < param->num_silk; i++) {
-        silk__set_state(&engine->silks[i], SILK_STATE__FREE);
-        engine->silks[i].silk_id = i;
-    }
 
     // initialize the msg queue object
     ret = silk_sched_init(&engine->msg_sched);
@@ -296,15 +287,20 @@ silk_init (struct silk_engine_t               *engine,
         goto msg_q_init_fail;
     }
 
-    // initialize all silk context to the internal entry function
+    // initialize per silk control & set context to the internal entry function
     for (i=0, addr=engine->stack_addr, s=engine->silks;
          i < param->num_silk;
          i++, addr += SILK_PADDED_STACK(param), s++) {
+        silk__set_state(&engine->silks[i], SILK_STATE__BOOT);
+        engine->silks[i].silk_id = i;
         assert(addr == silk_get_stack_from_id(engine, i));
         silk_create_initial_stack_context(&s->exec_state,
                                           silk__main,
                                           addr,//silk_get_stack_from_id(engine, msg.silk_id),
                                           SILK_USEABLE_STACK(&engine->cfg));
+        ret = silk_send_msg_code(engine, SILK_MSG_BOOT, s->silk_id);
+        // ask each silk to boot into the place they all wait for msgs
+        assert(ret == SILK_STAT_OK);
     }
     
     // let the thread execution start
@@ -312,6 +308,9 @@ silk_init (struct silk_engine_t               *engine,
     if (ret != SILK_STAT_OK) {
         goto thread_init_fail;
     }
+
+    // wait until all BOOT msgs are processed.
+    sleep(2);
 
     return SILK_STAT_OK;
 
@@ -468,7 +467,7 @@ int main (int   argc, char **argv)
         .stack_addr = (void*)0xb0000000,
         .num_stack_pages = 16,
         .num_stack_seperator_pages = 4,
-        .num_silk = 1024,
+        .num_silk = 4, //1024,
         .idle_cb = ping_pong_idle_cb,
         .ctx = NULL,
     };

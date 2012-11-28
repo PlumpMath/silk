@@ -63,6 +63,7 @@ struct silk_engine_param_t {
  * The states at which a silk object can be
  * current state | operation               | new state
  *-----------------------------------------------------------
+ * BOOT          | process SILK_MSG_BOOT   | FREE
  * FREE          | silk_alloc()            | ALLOC
  * ALLOC         | process MSG_START       | RUN
  * RUN           | silk__exit()            | TERM
@@ -70,13 +71,14 @@ struct silk_engine_param_t {
  * TERM          | process recycle msg     | FREE
  */
 #define SILK_STATE__FIRST   0x0
-#define SILK_STATE__FREE    0x0 // free for anyone to allocate
-#define SILK_STATE__ALLOC   0x1 // allocated but hasnt started running yet
+#define SILK_STATE__BOOT    0x0 // the silk boots (i.e.: hasnt reached the point it can process msg)
+#define SILK_STATE__FREE    0x1 // free for anyone to allocate
+#define SILK_STATE__ALLOC   0x2 // allocated but hasnt started running yet
 // do we need SILK_STATE_IGNITE ?
-#define SILK_STATE__RUN     0x2 // running, not terminated/exited yet
-#define SILK_STATE__TERM    0x3 // terminated, pending recycle to make it FREE
-#define SILK_STATE__LAST    0x3
-#define SILK_STATE__MASK    0x3 // MASK to clear everything but the state bits
+#define SILK_STATE__RUN     0x3 // running, not terminated/exited yet
+#define SILK_STATE__TERM    0x4 // terminated, pending recycle to make it FREE
+#define SILK_STATE__LAST    0x4
+#define SILK_STATE__MASK    0x7 // MASK to clear everything but the state bits
 
 // extract the state of a silk instance
 #define SILK_STATE(s)   ((s)->state & SILK_STATE__MASK)
