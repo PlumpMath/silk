@@ -10,7 +10,7 @@
  * 1) fixed size for msg instance & the whole msg queue.
  * 2) queue access requires a lock
  * 3) queue is processed with strict order of FIFO
- * 4) when terminated, will process the whole queue until it pops the SILK_MSG_TERM msg
+ * 4) when terminated, will process the whole queue until it pops the SILK_MSG_TERM_THREAD msg
  *
  * Notes:
  * Some API's have both a locked & unlocked version. the unlocked has a 
@@ -22,6 +22,8 @@
  */
 
 struct silk_incoming_msg_queue_t {
+    // common info of all schedulers.
+    struct silk_sched_base_t     base;
     // a mutex to guard any access to the queue
     pthread_mutex_t              mtx;
     // a fixed number of msgs in a simple msg queue.
@@ -139,7 +141,8 @@ silk_sched_send(struct silk_incoming_msg_queue_t      *q,
 
 /*
  * fetch the next msg to be processed, based on the scheduler scheduling decision
- * This is the place to implement various scheduling policies such as priority queue, etc
+ * This is the place to implement various scheduling policies such as priority
+ * queue, etc
  * return true when a msg is returned, false otherwise
  */
 bool silk_sched_get_next(struct silk_incoming_msg_queue_t      *q,

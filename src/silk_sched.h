@@ -13,6 +13,14 @@
  * 4) a queue with application-specific decision logic
  */
 
+/*
+ * common info of all schedulers.
+ */
+struct silk_sched_base_t {
+    void *dummy;// TODO: consider removing this structure if no use
+};
+
+
 #include "silk_sched_vanilla.h"
 
 #endif // __SILK_SCHED_H__

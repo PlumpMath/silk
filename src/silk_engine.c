@@ -3,6 +3,7 @@
  */
 
 #include <memory.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <assert.h>
 #include <errno.h>
@@ -13,19 +14,20 @@
 
 
 
-
-
-
 /*
  * Information related to the Silk engine thread (e.g.: pthread, etc) which is used to actually execute the micro-threads
  */
 struct silk_execution_thread_t {
-  // The silk processing instance that this thread serves
-  struct silk_engine_t               *engine;
-  // The pthread ID that is used as our execution engine
-  pthread_t                          id;
-  // indicate when the thread should terminate itself.
-  bool                               terminate;
+    // The silk processing instance that this thread serves
+    struct silk_engine_t               *engine;
+    // The pthread ID that is used as our execution engine
+    pthread_t                          id;
+    /*
+     * The silk context maintained for the pthread, when we switch from
+     * the pthread to the first silk. we'll use it back only when we terminate
+     * the engine, when the processing thread needs to terminate
+     */
+    struct silk_exec_state_t           exec_state;
 };
 
  
@@ -33,93 +35,155 @@ struct silk_execution_thread_t {
  * A processing engine with a single thread
  */
 struct silk_engine_t {
+    // a mutex to guard access to engine state
+    pthread_mutex_t                        mtx;
     // the thread which actually runs all silks
     struct silk_execution_thread_t         exec_thr;
     // msgs which are pending processing
     struct silk_incoming_msg_queue_t       msg_sched;
     // the memory area used as stack for the uthreads
     void                                   *stack_addr;
+    // the state of each silk instance, inc. the context-switch
+    struct silk_t                          *silks;
     // the configuration we started with
     struct silk_engine_param_t             cfg;
+    // indicate when the thread should terminate itself.
+    bool                                   terminate;
 };
+
+/*
+ * a unique integer identifying the silk instance.
+ */
+typedef uint32_t   silk_id_t;
+
+// verify that a silk ID is valid.
+#define SILK_ASSERT_ID(engine, silk_id)   assert((silk_id) < (engine)->cfg.num_silk)
+
+static inline void *
+silk_get_stack_from_id(struct silk_engine_t   *engine,
+                       silk_id_t              silk_id)
+{
+    SILK_ASSERT_ID(engine, silk_id);
+    return engine->stack_addr + silk_id * SILK_PADDED_STACK(&engine->cfg);
+}
+
+static inline struct silk_t *
+silk_get_ctrl_from_id(struct silk_engine_t   *engine,
+                      silk_id_t              silk_id)
+{
+    SILK_ASSERT_ID(engine, silk_id);
+    return engine->silks + silk_id;
+}
 
 
 /*
- * do a context switch between the uthread pointed
- * register EAX & ECX are defined such that the caller responsibility is to save & restore them – hence we don’t need to save/restore them as part of the context.
- *
- * BEWARE: inline assembly sometimes causes the compiler to generate wrong code. however, its better for performance bcz each function that calls for a context switch will have its own copy thereby allowing branch prediction to accurately predict the jumps. and it also save stack frame work :)
- *
- * Input:
- * first parameter is the destination stack, here its EAX register
- * first parameter is the destination stack, here its EBX register
+ * This is the internal entry function of all silks.
+ * a silk uthread starts its life here & then allocated, runs & 
+ * Note:
+ * The function prototype MUST be maintained the same as the function that switches context bcz we start this function by "switching context" into it. DO WE REALLY NEED IT SO ?????
  */
-#if 0
-/*static inline*/ void
-silk_swap_stack_context(void***, void**) __attribute__((regparm(2)));
-/*static inline*/ void
-silk_swap_stack_context(void***, void**) /*__attribute__((regparm(2)))*/
+static void silk__main ()
 {
-    __asm__(
-	    "pushl %ebp\n\t"
-	    "pushl %ebx\n\t"
-	    "pushl %esi\n\t"
-	    "pushl %edi\n\t"
-	    "movl  %esp, (%eax)\n\t"
-	    "movl  %edx, %esp\n\t"
-	    "popl  %edi\n\t"
-	    "popl  %esi\n\t"
-	    "popl  %ebx\n\t"
-	    "popl  %ebp\n\t"
-	    "ret\n\t"
-	    );
-}
-#endif
+    struct silk_execution_thread_t         *exec_thr = silk__my_thread_obj();
+    struct silk_engine_t                   *engine = exec_thr->engine;
+    struct silk_msg_t       msg;
+    //struct silk_t           *s;
 
- 
+
+    printf("%s: i'm here :)\n", __func__);
+    do {
+        // retrieve the next msg (based on priorities & any other application
+        // specific rule) to be processed.
+        if (silk_sched_get_next(&exec_thr->engine->msg_sched, &msg)) {
+            switch (msg.msg) {
+            case SILK_MSG_START:
+                /*
+                s = silk_get_ctrl_from_id(engine, msg.silk_id);
+                silk_create_initial_stack_context(&s->exec_state,
+                                                  s->entry_point,
+                                                  silk_get_stack_from_id(engine, msg.silk_id),
+                                                  SILK_USEABLE_STACK(&engine->cfg));
+                */
+                assert(0); // TODO: implement
+                break;
+
+            case SILK_MSG_TERM:
+                SILK_INFO("silk thread %lu:%d processing TERM msg", 
+                          exec_thr->id, msg.silk_id);
+                /*
+                 * BEWARE: we push the silk on which we currently execute to the free list.
+                 * This is OK as long as the addition of the silk to the free list is
+                 * protected by a lock so no other thread can allocate it & fire it while
+                 * we use its stack.
+                 */
+                break;
+
+            case SILK_MSG_TERM_THREAD:
+                SILK_INFO("kernel thread %lu processing TERM msg", exec_thr->id);
+                engine->terminate = true;
+                break;
+
+            default:
+                // switch into the uthread that is the msg destination
+                assert(0); // DO IT !!!
+            }
+        } else {
+            // IDLE processing
+            engine->cfg.idle_cb(exec_thr);
+        }
+    } while (likely(engine->terminate == false));
+}
+
 /*
  * This is the entry function for a pthread that is used to execute uthreads.
  * we first switch into a uthread & then jump from one uthread to another WITHOUT ever going back to the pthread-provided stack (we might want that for IDLE callback processing)
  * when the engine is terminated, the thread will switch from the last uthread is executed to the original pthread stack frame (in which this function started to execute) & this function will then return & terminate the posix thread.
  */
-static void *silk_thread_entry(void *ctx)
+static void *silk__thread_entry(void *ctx)
 {
     struct silk_execution_thread_t         *exec_thr = (struct silk_execution_thread_t*)ctx;
     struct silk_engine_t                   *engine = exec_thr->engine;
-    struct silk_msg_t                      msg;
+    struct silk_t       *s;
+    silk_id_t           silk_id = 0; // the silk we'll start to run on.
 
-    do {
-	// retrieve the next msg (based on priorities & any other application
-	// specific rule) to be processed.
-	if (silk_sched_get_next(&exec_thr->engine->msg_sched, &msg)) {
-	    if (unlikely(msg.msg == SILK_MSG_TERM)) {
-		SILK_INFO("thread %lu processing TERM msg", exec_thr->id);
-		exec_thr->terminate = true;
-	    } else {
-		// switch into the uthread that is the msg destination
-		assert(0); // DO IT !!!
-	    }
-	} else {
-	    // IDLE processing
-	    engine->cfg.idle_cb(exec_thr);
-	}
-    } while (likely(exec_thr->terminate == false));
+
+    SILK_INFO("Thread starting. id=%lu", exec_thr->id);
+    // set the Silk thread object so every thread to hs access to its own
+    silk__set_tls(SILK_TLS__THREAD_OBJ, exec_thr);
+    /*
+     * switch into one silk (no matter which) to start processing msgs. from that
+     * point onwards, we'll only switch from one silk to another without ever 
+     * switching back to the original pthread-provided stack.
+     * p.s.
+     * one might want to consider calling the IDLE function using the pthread stack.
+     * but this implies a little extra overhead.
+     * BEWARE: we are swapping into a silk which is designated "free" & use its stack
+     * for our execution until we switch into a silk for processng its msg.
+     */
+    s = silk_get_ctrl_from_id(engine, silk_id);
+#if defined (__i386__)
+    silk_swap_stack_context(s->exec_state.esp, &exec_thr->exec_state.esp);
+#elif defined (__x86_64__)
+#error "not implemented"
+    // it should be of the form:
+    silk_swap_stack_context(&s->exec_state, &exec_thr->exec_state);
+#endif
+    // we get here only if the engine is terminating !!!
     SILK_INFO("Thread exiting. id=%lu", exec_thr->id);
     return NULL;
 }
 
 enum silk_status_e
 silk_thread_init (struct silk_execution_thread_t        *exec_thr,
-		  struct silk_engine_t                  *engine)
+                  struct silk_engine_t                  *engine)
 {
     int          rc;
  
 		
     exec_thr->engine = engine;
-    exec_thr->terminate = false;
-    rc = pthread_create(&exec_thr->id, NULL, silk_thread_entry, exec_thr);
+    rc = pthread_create(&exec_thr->id, NULL, silk__thread_entry, exec_thr);
     if (rc != 0) {
-	return SILK_STAT_THREAD_CREATE_FAILED;
+        return SILK_STAT_THREAD_CREATE_FAILED;
     }
     return SILK_STAT_OK;
 }
@@ -129,7 +193,7 @@ silk_thread_init (struct silk_execution_thread_t        *exec_thr,
  */
 static inline enum silk_status_e
 silk_send_msg (struct silk_engine_t                  *engine,
-	       struct silk_msg_t                     *msg)
+               struct silk_msg_t                     *msg)
 {
     enum silk_status_e    silk_stat;
 
@@ -142,12 +206,12 @@ silk_send_msg (struct silk_engine_t                  *engine,
  */
 static inline enum silk_status_e
 silk_send_msg_code (struct silk_engine_t                  *engine,
-		    enum silk_msg_code_e                  msg_code,
-		    uint32_t                              silk_id)
+                    enum silk_msg_code_e                  msg_code,
+                    uint32_t                              silk_id)
 {
     struct silk_msg_t        msg = {
-	.msg = msg_code,
-	.silk_id = silk_id,
+        .msg = msg_code,
+        .silk_id = silk_id,
     };
     return silk_send_msg (engine, &msg);
 }
@@ -155,7 +219,7 @@ silk_send_msg_code (struct silk_engine_t                  *engine,
 static inline enum silk_status_e
 silk_eng_terminate (struct silk_execution_thread_t       *exec_thr)
 {
-    return silk_send_msg_code(exec_thr->engine, SILK_MSG_TERM, 0/* doesnt matter - its for the engine itself*/);
+    return silk_send_msg_code(exec_thr->engine, SILK_MSG_TERM_THREAD, 0/* doesnt matter - its for the engine itself*/);
 }
  
 
@@ -165,7 +229,7 @@ silk_eng_join (struct silk_execution_thread_t                    *exec_thr)
     int rc;
     rc = pthread_join(exec_thr->id, NULL);
     if (rc == 0)
-	return SILK_STAT_OK;
+        return SILK_STAT_OK;
     return SILK_STAT_THREAD_ERROR;
 }
 
@@ -179,16 +243,20 @@ silk_init (struct silk_engine_t               *engine,
     size_t                 stack_size;
     int                    mem_flags;
     void                   *addr;
+    struct silk_t          *s;
     int                    i, rc;
  
 
-    if (param-> num_stack_pages < 1)
-	return SILK_STAT_INVALID_STACK_SIZE;
-    if (param-> num_silk < SILK_MIN_NUM_THREADS)
-	return SILK_STAT_INVALID_NUM_SILK;
+    if (param->num_stack_pages < 1)
+        return SILK_STAT_INVALID_STACK_SIZE;
+    if (param->num_silk < SILK_MIN_NUM_THREADS)
+        return SILK_STAT_INVALID_NUM_SILK;
 
     memset(engine, 0, sizeof(*engine));
     memcpy(&engine->cfg, param, sizeof(engine->cfg));
+    engine->terminate = false;
+    pthread_mutex_init(&engine->mtx,NULL);
+
     /*
      * allocate memory for stacks
      * memory layout would be
@@ -196,49 +264,69 @@ silk_init (struct silk_engine_t               *engine,
      * all memory is initially allocated as "No Access" & only the alowed 
      * areas will be allowed on top of that.
      */
-    stack_size = SILK_SINGLE_STACK(param) * param->num_silk;
+    stack_size = SILK_PADDED_STACK(param) * param->num_silk;
     mem_flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK;
     if (param->stack_addr != NULL) {
-	mem_flags |= MAP_FIXED;
+        mem_flags |= MAP_FIXED;
     }
     /* 
      * configuration indicate whether to lock the stacks area into memory or 
      * not. This also requires permissions
      */
     if (param->flags & SILK_CFG_FLAG_LOCK_STACK_MEM) {
-	mem_flags |= MAP_LOCKED;
+        mem_flags |= MAP_LOCKED;
     }
     mem_flags |= MAP_POPULATE;// TODO: consider this as config param as it consumes lots of memory. will be meaningfull only if terminated Silks are pushed to the head of the free Silk queue.
     // TODO: what about MAP__NORESERVE to save swap space?
+    // TODO: x86 stack grows downward - so we probably need a protection page before the first stack area.
     engine->stack_addr = mmap(param->stack_addr, stack_size, PROT_NONE, 
-			      mem_flags, -1 /* ignored*/, 0);
+                              mem_flags, -1 /* ignored*/, 0);
     if (engine->stack_addr == MAP_FAILED) {
-	SILK_ERROR("Failed to allocate stack memory area. errno=%d", errno);
-	ret = SILK_STAT_STACK_ALLOC_FAILED;
-	goto stack_alloc_fail;
+        SILK_ERROR("Failed to allocate stack memory area. errno=%d", errno);
+        ret = SILK_STAT_STACK_ALLOC_FAILED;
+        goto stack_alloc_fail;
     }
-    // TODO: set each Silk instance stack area to PROT_WRITE
+    // set each Silk instance stack area to PROT_WRITE
     for (i=0, addr=engine->stack_addr;
-	 i < param->num_silk;
-	 i++, addr += SILK_SINGLE_STACK(param)) {
-	rc = mprotect(addr, param->num_stack_pages * PAGE_SIZE, PROT_WRITE);
-	if (rc != 0) {
-	    SILK_ERROR("Failed to set stack memory protection. errno=%d", errno);
-	    ret = SILK_STAT_STACK_PROTECTION_SCHEME_FAILED;
-	    goto stack_prot_fail;
-	}
+         i < param->num_silk;
+         i++, addr += SILK_PADDED_STACK(param)) {
+        rc = mprotect(addr, param->num_stack_pages * PAGE_SIZE, PROT_WRITE);
+        if (rc != 0) {
+            SILK_ERROR("Failed to set stack memory protection. errno=%d",
+                       errno);
+            ret = SILK_STAT_STACK_PROTECTION_SCHEME_FAILED;
+            goto stack_prot_fail;
+        }
+    }
+
+    // allocate per silk instance context information
+    engine->silks = calloc(param->num_silk, sizeof(*engine->silks));
+    if (engine->silks == NULL) {
+        ret = SILK_STAT_ALLOC_FAIL;
+        goto silk_state_alloc_fail;
     }
 
     // initialize the msg queue object
     ret = silk_sched_init(&engine->msg_sched);
     if (ret != SILK_STAT_OK) {
-	goto msg_q_init_fail;
+        goto msg_q_init_fail;
     }
 
+    // initialize all silk context to the internal entry function
+    for (i=0, addr=engine->stack_addr, s=engine->silks;
+         i < param->num_silk;
+         i++, addr += SILK_PADDED_STACK(param), s++) {
+        assert(addr == silk_get_stack_from_id(engine, i));
+        silk_create_initial_stack_context(&s->exec_state,
+                                          silk__main,
+                                          addr,//silk_get_stack_from_id(engine, msg.silk_id),
+                                          SILK_USEABLE_STACK(&engine->cfg));
+    }
+    
     // let the thread execution start
     ret = silk_thread_init(&engine->exec_thr, engine);
     if (ret != SILK_STAT_OK) {
-	goto thread_init_fail;
+        goto thread_init_fail;
     }
 
     return SILK_STAT_OK;
@@ -246,29 +334,38 @@ silk_init (struct silk_engine_t               *engine,
  thread_init_fail:
     silk_sched_terminate(&engine->msg_sched);
  msg_q_init_fail:
+    free(engine->silks);
+ silk_state_alloc_fail:
  stack_prot_fail:
     rc = munmap(param->stack_addr, stack_size);
     if (rc != 0) {
-	SILK_ERROR("Failed to unmap stack area memory. errno=%d", errno);
-	/* were already in error handling path - continue as if no error */
+        SILK_ERROR("Failed to unmap stack area memory. errno=%d", errno);
+        /* were already in error handling path - continue as if no error */
     }
  stack_alloc_fail:
+    pthread_mutex_destroy(&engine->mtx);
 
     return ret;
 }
 
 /*
- * notifies the engine to terminate itself (i.e.: stop processing & be ready for cleanup)
+ * notifies the engine to terminate itself (i.e.: stop processing & be ready for
+ * cleanup).
+ * BEWARE: once this API is called, you must wait until the engine has stopped
+ * procesing msgs !!!
  */
 enum silk_status_e
 silk_terminate(struct silk_engine_t   *engine)
 {
-    silk_eng_terminate(&engine-> exec_thr);
+    silk_eng_terminate(&engine->exec_thr);
 
     return SILK_STAT_OK;
 }
  
 
+/*
+ * wait for the thread to terminate & free all resources allocated to an engine.
+ */
 enum silk_status_e
 silk_join(struct silk_engine_t   *engine)
 {
@@ -280,29 +377,45 @@ silk_join(struct silk_engine_t   *engine)
 
     ret = silk_eng_join(&engine->exec_thr);
     if (ret != SILK_STAT_OK)
-	return ret;
-    stack_size = SILK_SINGLE_STACK(cfg) * cfg->num_silk;
+        return ret;
+    free(engine->silks);
+    stack_size = SILK_PADDED_STACK(cfg) * cfg->num_silk;
     rc = munmap(engine->stack_addr, stack_size);
     if (rc != 0) {
-	SILK_ERROR("Failed to unmap stack area memory. errno=%d", errno);
-	ret = SILK_STAT_STACK_FREE_FAILED;
+        SILK_ERROR("Failed to unmap stack area memory. errno=%d", errno);
+        ret = SILK_STAT_STACK_FREE_FAILED;
     }
     return ret;
 }
 
- 
-
 /*
-  free all resources allocated to an engine.
-            *make sure the engine has terminated !!!
-*/
-void
-silk_destroy (struct silk_engine_t   *engine)
+ * allocate a silk instance to schedule new work
+ */ 
+enum silk_status_e
+silk_alloc(struct silk_engine_t   *engine,
+           silk_uthread_func_t    entry_point)
 {
- 
+    pthread_mutex_lock(&engine->mtx);
+    // TODO: alloc a Silk instance
+    static int silk_id = 0;
+    enum silk_status_e   silk_stat;
 
+    assert(silk_id < engine->cfg.num_silk);
+
+    struct silk_t  *s;
+
+    s = &engine->silks[silk_id];
+    s->entry_point = entry_point;
+    silk_stat = silk_send_msg_code(engine, SILK_MSG_START, silk_id);
+
+    silk_id++;
+    pthread_mutex_unlock(&engine->mtx);
+    return silk_stat;
 }
 
+/*
+ * a ping pong example to measure performance of silk scheduling.
+ */
 #include <unistd.h> 
 static void
 ping_pong_idle_cb (struct silk_execution_thread_t   *exec_thr)
@@ -316,18 +429,28 @@ ping_pong_idle_cb (struct silk_execution_thread_t   *exec_thr)
     // TODO: replace with real code. for now just exit after some time
 }
 
+static void
+ping_pong_entry_func (void)
+{
+    int i;
+    
+    printf("%s: starts...\n", __func__);
+    printf("%s: &i=0x%p", __func__, &i);
+    printf("%s: ends!!!\n", __func__);
+}
+
 int main (int   argc, char **argv)
 {
     struct silk_engine_param_t    silk_param = {
-	.flags = 0,
-	// TODO: make it possible to select an address!!!
-	.stack_addr = (void*)NULL,
-	//.stack_addr = (void*)0xb0000000,
-	.num_stack_pages = 16,
-	.num_stack_seperator_pages = 4,
-	.num_silk = 1024,
-	.idle_cb = ping_pong_idle_cb,
-	.ctx = NULL,
+        .flags = 0,
+        // TODO: make it possible to select an address!!!
+        //.stack_addr = (void*)NULL,
+        .stack_addr = (void*)0xb0000000,
+        .num_stack_pages = 16,
+        .num_stack_seperator_pages = 4,
+        .num_silk = 1024,
+        .idle_cb = ping_pong_idle_cb,
+        .ctx = NULL,
     };
     struct silk_engine_t   engine;
     enum silk_status_e     silk_stat;
@@ -337,6 +460,7 @@ int main (int   argc, char **argv)
     printf("Initializing Silk engine...\n");
     silk_stat = silk_init(&engine, &silk_param);
     printf("Silk initialization returns:%d\n", silk_stat);
+    silk_stat = silk_alloc(&engine, ping_pong_entry_func);
     sleep(10);
     silk_stat = silk_terminate(&engine);
     printf("Silk termination returns:%d\n", silk_stat);

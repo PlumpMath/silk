@@ -7,7 +7,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "silk_base.h"
+#include "silk_tls.h"
 #include "silk_sched.h"
+#include "silk_context.h"
 
 
 
@@ -19,15 +21,6 @@
  */
 struct silk_execution_thread_t;
 struct silk_engine_t;
-
-/*
- * the context that is saved for a silk uthread when it is swapped-out.
- * for now we save the whole context on the stack, so just the ESP needs to be
- * here
- */
-struct silk_exec_state_t {
-    void  *esp_register;
-};
 
 
 
@@ -70,11 +63,13 @@ struct silk_engine_param_t {
 /*
  * a single silk uthread instance
  */
-struct silk_context_t {
-  // The silk processing instance that this thread serves
-  //struct silk_engine_t        engine;
-  // the context saved during the last run.
-  struct silk_exec_state_t      exec_state;
+struct silk_t {
+    // the entry function of the silk thread
+    silk_uthread_func_t           entry_point;
+    // the context saved during the last run.
+    struct silk_exec_state_t      exec_state;
+    // The silk processing instance that this thread serves
+    //struct silk_engine_t        engine;
 };
 
 
