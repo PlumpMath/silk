@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
+#define __USE_XOPEN_EXTENDED
+#include <unistd.h>
 #include "silk.h"
 
 

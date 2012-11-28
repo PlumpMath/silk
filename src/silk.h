@@ -227,8 +227,7 @@ silk__my_ctrl()
     return &engine->silks[my_silk_id];
 }
 
-//TODO: make this return "void"!!!
-bool silk_yield(struct silk_msg_t   *msg);
+void silk_yield(struct silk_msg_t   *msg);
 
 enum silk_status_e
 silk_init (struct silk_engine_t               *engine,

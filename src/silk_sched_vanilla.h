@@ -117,6 +117,19 @@ silk_sched_is_full(struct silk_incoming_msg_queue_t      *q)
     return ret;
 }
 
+static inline uint32_t
+_silk_sched_get_q_size(struct silk_incoming_msg_queue_t      *q)
+{
+    const uintptr_t   wr = (uintptr_t)(q->next_write);
+    const uintptr_t   rd = (uintptr_t)(q->next_read);
+    const uintptr_t   start = (uintptr_t)(q->msgs);
+    uint32_t   size;
+
+
+    // beware of optimizing this to cause dangerous wraparounds
+    size = (wr - start) - (rd-start);
+    return size;
+}
 
 /*
  * if queue isnt full, write the msg into the tail of the queue
