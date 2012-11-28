@@ -51,10 +51,6 @@ struct silk_engine_t {
     bool                                   terminate;
 };
 
-/*
- * a unique integer identifying the silk instance.
- */
-typedef uint32_t   silk_id_t;
 
 // verify that a silk ID is valid.
 #define SILK_ASSERT_ID(engine, silk_id)   assert((silk_id) < (engine)->cfg.num_silk)
@@ -82,12 +78,12 @@ silk_get_ctrl_from_id(struct silk_engine_t   *engine,
  * Note:
  * The function prototype MUST be maintained the same as the function that switches context bcz we start this function by "switching context" into it. DO WE REALLY NEED IT SO ?????
  */
-static void silk__main ()
+static void silk__main () /*__attribute__((no_return))*/
 {
     struct silk_execution_thread_t         *exec_thr = silk__my_thread_obj();
     struct silk_engine_t                   *engine = exec_thr->engine;
     struct silk_msg_t       msg;
-    //struct silk_t           *s;
+    struct silk_t           *s;
 
 
     printf("%s: i'm here :)\n", __func__);
@@ -97,14 +93,11 @@ static void silk__main ()
         if (silk_sched_get_next(&exec_thr->engine->msg_sched, &msg)) {
             switch (msg.msg) {
             case SILK_MSG_START:
-                /*
                 s = silk_get_ctrl_from_id(engine, msg.silk_id);
-                silk_create_initial_stack_context(&s->exec_state,
-                                                  s->entry_point,
-                                                  silk_get_stack_from_id(engine, msg.silk_id),
-                                                  SILK_USEABLE_STACK(&engine->cfg));
-                */
-                assert(0); // TODO: implement
+                assert(SILK_STATE(s) == SILK_STATE__ALLOC);
+                SILK_INFO("silk %d starting", silk__my_id());
+                s->entry_func();
+                SILK_INFO("silk %d ended", silk__my_id());
                 break;
 
             case SILK_MSG_TERM:
@@ -132,6 +125,14 @@ static void silk__main ()
             engine->cfg.idle_cb(exec_thr);
         }
     } while (likely(engine->terminate == false));
+    SILK_INFO("thread %lu switching back to pthread stack", exec_thr->id);
+#if defined (__i386__)
+    silk_swap_stack_context(exec_thr->exec_state.esp, &s->exec_state.esp);
+#elif defined (__x86_64__)
+#error "not implemented"
+    // it should be of the form:
+    silk_swap_stack_context(&exec_thr->exec_state, &s->exec_state);
+#endif
 }
 
 /*
@@ -393,7 +394,7 @@ silk_join(struct silk_engine_t   *engine)
  */ 
 enum silk_status_e
 silk_alloc(struct silk_engine_t   *engine,
-           silk_uthread_func_t    entry_point)
+           silk_uthread_func_t    entry_func)
 {
     pthread_mutex_lock(&engine->mtx);
     // TODO: alloc a Silk instance
@@ -405,7 +406,8 @@ silk_alloc(struct silk_engine_t   *engine,
     struct silk_t  *s;
 
     s = &engine->silks[silk_id];
-    s->entry_point = entry_point;
+    s->entry_func = entry_func;
+    silk__set_state(s, SILK_STATE__ALLOC);
     silk_stat = silk_send_msg_code(engine, SILK_MSG_START, silk_id);
 
     silk_id++;
@@ -435,7 +437,7 @@ ping_pong_entry_func (void)
     int i;
     
     printf("%s: starts...\n", __func__);
-    printf("%s: &i=0x%p", __func__, &i);
+    printf("%s: &i=0x%p\n", __func__, &i);
     printf("%s: ends!!!\n", __func__);
 }
 

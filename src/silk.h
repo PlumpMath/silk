@@ -23,6 +23,10 @@ struct silk_execution_thread_t;
 struct silk_engine_t;
 
 
+/*
+ * a unique integer identifying the silk instance.
+ */
+typedef uint32_t   silk_id_t;
 
  
 /*
@@ -59,23 +63,65 @@ struct silk_engine_param_t {
     void                                *ctx;
 };
 
- 
+/*
+ * The states at which a silk object can be
+ * current state | operation               | new state
+ *-----------------------------------------------------------
+ * FREE          | silk_alloc()            | ALLOC
+ * ALLOC         | process MSG_START       | RUN
+ * RUN           | silk__exit()            | TERM
+ *               | entry function returns  | TERM
+ * TERM          | process recycle msg     | FREE
+ */
+#define SILK_STATE__FIRST   0x0
+#define SILK_STATE__FREE    0x0 // free for anyone to allocate
+#define SILK_STATE__ALLOC   0x1 // allocated but hasnt started running yet
+#define SILK_STATE__RUN     0x2 // running, not terminated/exited yet
+#define SILK_STATE__TERM    0x3 // terminated, pending recycle to make it FREE
+#define SILK_STATE__LAST    0x3
+#define SILK_STATE__MASK    0x3 // MASK to clear everything but the state bits
+
+// extract the state of a silk instance
+#define SILK_STATE(s)   ((s)->state & SILK_STATE__MASK)
+
+
 /*
  * a single silk uthread instance
  */
 struct silk_t {
     // the entry function of the silk thread
-    silk_uthread_func_t           entry_point;
+    silk_uthread_func_t           entry_func;
     // the context saved during the last run.
     struct silk_exec_state_t      exec_state;
     // The silk processing instance that this thread serves
     //struct silk_engine_t        engine;
+    /*
+     * the state of this silk
+     * 2 bits : current state of silk object
+     */
+    uint32_t                      state;
 };
 
+static inline void 
+silk__set_state(struct silk_t   *s,
+                uint32_t         new_state)
+{
+    assert((new_state >= SILK_STATE__FIRST) && (new_state <= SILK_STATE__LAST));
+    s->state = (s->state & ~SILK_STATE__MASK) | new_state;
+}
 
 
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
+
+/*
+ * returns the silk id of the caller
+ */
+silk_id_t silk__my_id()
+{
+    // TODO: implement this based on TLS of engine object
+    return 0;
+}
 
 #endif // __SILK_H__
