@@ -77,9 +77,9 @@ struct silk_engine_param_t {
 #define SILK_STATE__FREE    0x1 // free for anyone to allocate
 #define SILK_STATE__ALLOC   0x2 // allocated but hasnt started running yet
 #define SILK_STATE__RUN     0x3 // running, not terminated/exited yet
-#define SILK_STATE__TERM    0x4 // terminated, pending recycle to make it FREE
+#define SILK_STATE__TERM    0x4 // actively running but terminated. once it calls silk_yield() it will be recycled & return to the free pool
 #define SILK_STATE__LAST    0x4
-#define SILK_STATE__MASK    0x7 // MASK to clear everything but the state bits
+#define SILK_STATE__MASK    0x7 // MASK to extract the state bits
 
 // extract the state of a silk instance
 #define SILK_STATE(s)   ((s)->state & SILK_STATE__MASK)
@@ -115,7 +115,6 @@ silk__set_state(struct silk_t   *s,
     assert((new_state >= SILK_STATE__FIRST) && (new_state <= SILK_STATE__LAST));
     s->state = (s->state & ~SILK_STATE__MASK) | new_state;
 }
-
 
 /*
  * Information related to the Silk engine thread (e.g.: pthread, etc) which is used to 
@@ -226,6 +225,14 @@ silk__my_ctrl()
     return &engine->silks[my_silk_id];
 }
 
+static inline struct silk_t *
+silk_id_to_ctrl(silk_id_t    silk_id)
+{
+    struct silk_execution_thread_t *exec_thr = silk__my_thread_obj();
+    struct silk_engine_t           *engine = exec_thr->engine;
+    return &engine->silks[silk_id];
+}
+
 void silk_yield(struct silk_msg_t   *msg);
 
 enum silk_status_e
@@ -247,6 +254,36 @@ silk_alloc(struct silk_engine_t   *engine,
 enum silk_status_e
 silk_dispatch(struct silk_engine_t   *engine,
               struct silk_t          *s);
+
+
+/*
+ * allows any thread (rather than only a silk instance) to kill a silk instance.
+ */
+enum silk_status_e
+silk_eng_kill(struct silk_engine_t   *engine,
+              struct silk_t          *silk);
+
+/*
+ * allows a silk instance to kill any silk instance, whether itself or not.
+ */
+static inline enum silk_status_e
+silk_kill(struct silk_t   *silk)
+{
+    struct silk_execution_thread_t         *exec_thr = silk__my_thread_obj();
+    struct silk_engine_t                   *engine = exec_thr->engine;
+
+    return silk_eng_kill(engine, silk);
+}
+
+/*
+ * allows a silk instance to kill any silk instance, whether itself or not.
+ */
+static inline enum silk_status_e
+silk_kill_id(silk_id_t      silk_id)
+{
+    return silk_kill(silk_id_to_ctrl(silk_id));
+}
+
 
 /*
  * send a msg object into the engine msg queue
@@ -275,6 +312,21 @@ silk_send_msg_code (struct silk_engine_t                  *engine,
         .silk_id = silk_id,
     };
     return silk_send_msg (engine, &msg);
+}
+
+/*
+ * query the number of free silks (i.e.: ready to be allocated)
+ */
+static inline uint32_t
+silk_eng__get_free_silks(struct silk_engine_t    *engine)
+{
+    uint32_t   num_free;
+
+    pthread_mutex_lock(&engine->mtx);
+    num_free = engine->num_free_silk;
+    pthread_mutex_unlock(&engine->mtx);
+
+    return num_free;
 }
 
 #endif // __SILK_H__

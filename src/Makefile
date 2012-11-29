@@ -23,14 +23,20 @@ run_n: run_n.o $(LIB_SILK)
 ping_pong.o: ping_pong.c $(LIB_HDR)
 	gcc ping_pong.c $(CFLAGS) $(CFLAGS_TESTS)
 
-ping_pong: ping_pong.o  $(LIB_SILK)
+ping_pong: ping_pong.o $(LIB_SILK)
 	gcc $(LFLAGS) ping_pong.o -o ping_pong $(LIBS) -L /home/bename/devel/silk-uthreads
 
-tests: run_n ping_pong
+ut_kill.o: ut_kill.c $(LIB_HDR)
+	gcc ut_kill.c $(CFLAGS) $(CFLAGS_TESTS)
+
+ut_kill: ut_kill.o $(LIB_SILK)
+	gcc $(LFLAGS) ut_kill.o -o ut_kill $(LIBS) -L /home/bename/devel/silk-uthreads
+
+tests: run_n ping_pong ut_kill
 	echo "building all tests"
 
 clean:
-	rm -f *.o core TAGS $(LIB_SILK) run_n ping_pong
+	rm -f *.o core TAGS $(LIB_SILK) run_n ping_pong ut_kill
 
 TAGS:
 	etags --output=TAGS *.c *.h

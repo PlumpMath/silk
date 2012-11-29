@@ -1,0 +1,1082 @@
+DBG :Initializing Silk engine...
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :send msg={code=1, id=1, ctx=(nil)}
+DBG :send msg={code=1, id=1, ctx=(nil)}
+DBG :send msg={code=1, id=2, ctx=(nil)}
+DBG :send msg={code=1, id=2, ctx=(nil)}
+DBG :send msg={code=1, id=3, ctx=(nil)}
+DBG :send msg={code=1, id=3, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+DBG :waiting for all BOOT msgs to be processed
+INFO:Thread starting. id=3077958464
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+DBG :recv msg={code=1, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :Silk#1 booting...
+DBG :recv msg={code=1, id=1, ctx=(nil)}
+DBG :Silk#1 processing BOOT msg
+DBG :recv msg={code=1, id=2, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#2
+DBG :Silk#2 booting...
+DBG :recv msg={code=1, id=2, ctx=(nil)}
+DBG :Silk#2 processing BOOT msg
+DBG :recv msg={code=1, id=3, ctx=(nil)}
+DBG :switching from Silk#2 to Silk#3
+DBG :Silk#3 booting...
+DBG :recv msg={code=1, id=3, ctx=(nil)}
+DBG :Silk#3 processing BOOT msg
+ut_kill__idle_cb
+DBG :All Silks completed booting !
+DBG :Silk initialization returns:0
+Test Case 1
+DBG :allocated Silk#0. still 3 available
+DBG :allocated silk No 0
+DBG :killing Silk#0
+DBG :silk 0 recycled into free list
+Test Case 2
+DBG :allocated Silk#0. still 3 available
+DBG :allocated silk No 0
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :dispatched silk#0 to do busy-wait
+DBG :waiting for the silk to enter busy-wait
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#3 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=0)
+DBG :looping indefenitely doing busy wait, waiting for exit signal
+DBG :requesting silk#0 to exit
+DBG :wait for the silk to become free
+DBG :breaking out of busy-wait
+DBG :ut_kill__main: Silk#0 ends!!!
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :killing Silk#0
+DBG :silk 0 is in state 1 - no point killing it.
+Test Case 3
+DBG :allocated Silk#0. still 3 available
+DBG :allocated silk No 0
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :dispatched silk#0 to wait for kill
+DBG :waiting for the silk to enter busy-wait
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=1)
+DBG :looping indefenitely doing busy wait, waiting for exit signal
+DBG :killing Silk#0
+DBG :Silk#0 killed by non silk thread
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :wait for silk to call yield()
+DBG :breaking out of busy-wait
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :wait for the silk to become free
+DBG :Silk#0 is free
+DBG :Now allocate a silk, make sure its the same instance we killed, dispatch it to see it running fine.
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+INFO:silk 0 ended
+ut_kill__idle_cb
+Test Case 4
+DBG :Stack range for Silk#0:start_stk_addr=0xb0010000, end_stk_addr=0xb0000000
+DBG :-----------------iteration#0, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :-----------------iteration#0, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :-----------------iteration#1, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#1, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#2, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#2, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#3, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#3, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#4, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#4, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#5, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#5, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#6, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#6, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#7, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#7, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#8, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#8, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#9, path=1------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :-----------------iteration#9, path=2------------------------
+DBG :using codepath # 1
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=2)
+DBG :Doing a SHALLOW (1) stack recursion...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :SHALLOW: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb000ff30
+DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+INFO:state= 2
+INFO:silk 0 starting
+DBG :ut_kill__main: Silk#0 starts... (oper=3)
+DBG :Doing a DEEP (1000) stack recursion ...
+DBG :silk commits suicide
+DBG :killing Silk#0
+DBG :Silk#0 killed by silk thread
+DBG :Silk#0 killing itself
+DBG :send msg={code=3, id=0, ctx=(nil)}
+DBG :recv msg={code=3, id=0, ctx=(nil)}
+DBG :recycling a terminated Silk#0
+!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+ut_kill__idle_cb
+DBG :DEEP: top_stack_frame_addr=0xb000ff6c, bottom_stack_frame_addr=0xb00043e0
+DBG :stack being used by DEEP silk code:0xbc20 Bytes
+DBG :verifying stack addresses are identical to previous run
+DBG :send msg={code=4, id=0, ctx=(nil)}
+DBG :Silk termination returns:0
+DBG :recv msg={code=4, id=0, ctx=(nil)}
+INFO:kernel thread 3077958464 processing TERM msg
+INFO:thread 3077958464 switching back to pthread stack
+INFO:Thread exiting. id=3077958464
+DBG :Silk join returns:0

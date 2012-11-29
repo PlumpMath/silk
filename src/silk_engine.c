@@ -36,6 +36,22 @@ silk_eng_is_ready (struct silk_engine_t      *engine)
 }
 
 
+static void
+silk_eng_add_free_silk(struct silk_engine_t       *engine,
+                       struct silk_t              *s)
+{
+    silk__set_state(s, SILK_STATE__FREE);
+    pthread_mutex_lock(&engine->mtx);
+    engine->num_free_silk++;
+    /*
+     * push the terminated silk instance to head of queue. better for CPU cache behavior
+     * p.s. : it will also reveal misuse of silk stack after its termination much faster.
+     */
+    SLIST_INSERT_HEAD(&engine->free_silks, s, next_free);
+    pthread_mutex_unlock(&engine->mtx);
+}
+
+
 /*
  * This is the internal entry function of all silks.
  * a silk uthread starts its life here & then allocated, runs & 
@@ -79,16 +95,20 @@ static void silk__main (void) /*__attribute__((no_return))*/
             silk__set_state(s, SILK_STATE__RUN);
             s->entry_func(s->entry_func_arg);
             assert(SILK_STATE(s) == SILK_STATE__RUN);
+#if 1
+            silk_eng_add_free_silk(engine, s);
+#else
             silk__set_state(s, SILK_STATE__FREE);
             pthread_mutex_lock(&engine->mtx);
             engine->num_free_silk++;
             pthread_mutex_unlock(&engine->mtx);
-            SILK_INFO("silk %d ended", silk__my_id());
             /*
              * push the terminated silk instance to head of queue. better for CPU cache behavior
              * p.s. : it will also reveal misuse of silk stack after its termination much faster.
              */
             SLIST_INSERT_HEAD(&engine->free_silks, s, next_free);
+#endif
+            SILK_INFO("silk %d ended", silk__my_id());
         } else if (likely(msg.msg == SILK_MSG_TERM)) {
             SILK_INFO("Silk#%d processing TERM msg", s->silk_id);
             /*
@@ -97,8 +117,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
              * protected by a lock so no other thread can allocate it & fire it while
              * we use its stack.
              */
-            // TODO: we need to support a msg from Silk#A to terminate Silk#B
-            
+            assert(0); // we can only get here for popin the TERM msg on a silk in state ALLOC.
         } else if (unlikely(msg.msg == SILK_MSG_TERM_THREAD)) {
             SILK_INFO("kernel thread %lu processing TERM msg", exec_thr->id);
             engine->terminate = true;
@@ -302,13 +321,13 @@ silk_init (struct silk_engine_t               *engine,
          * The first msg causes the scheduler to switch into it. it then runs from the 
          * beggining of silk__main() up to the first silk_yield() where it joins all
          * silks awaiting control msgs. however, the msg itself wasnt processed bcz
-         * it was lost when we switched into silk_main() which isnt built to retrieve
+         * it was lost when we switched into silk__main() which isnt built to retrieve
          * the msg which cause the context-switch into it.
          * the second msg is received by each silk instance & causes it to return from
          * the call to silk_yield(). this one is required only bcz the silk instance
          * state-machine requires a BOOT msg in order to change its state to FREE.
          * The second msg isnt sent to the INITIAL silk bcz this one executed its part
-         * from silk_main() to silk_yield() as part of the pthread initialization. the
+         * from silk__main() to silk_yield() as part of the pthread initialization. the
          * pthread switches into the INITIAL silk & this allows it to run up to the 
          * call to silk_yield().
          */
@@ -372,6 +391,7 @@ void silk_yield(struct silk_msg_t   *msg)
     struct silk_t                  *silk_trgt;
     silk_id_t                       msg_silk_id;
     bool                            is_msg_avail = false;
+    enum silk_status_e              ret;
 
 
     do {
@@ -381,24 +401,67 @@ void silk_yield(struct silk_msg_t   *msg)
          */
         if (silk_sched_get_next(&exec_thr->engine->msg_sched, &exec_thr->last_msg)) {
             {// debugging aid
-                struct silk_msg_t                     *msg = &exec_thr->last_msg;
-                SILK_DEBUG("recv msg={code=%d, id=%d, ctx=%p}", msg->msg, msg->silk_id, msg->ctx);
+                struct silk_msg_t                     *m = &exec_thr->last_msg;
+                SILK_DEBUG("recv msg={code=%d, id=%d, ctx=%p}", m->msg, m->silk_id, m->ctx);
             }
+            msg_silk_id = exec_thr->last_msg.silk_id;
+            silk_trgt = &engine->silks[msg_silk_id];
+            assert(silk_trgt->silk_id == msg_silk_id);
+            /*
+             * check if we got a msg instructing us to kill the silk instance. if so, no
+             * point to switch into it. just recycle it.
+             */
+            if (unlikely(exec_thr->last_msg.msg == SILK_MSG_TERM)) {
+                SILK_DEBUG("recycling a terminated Silk#%d", silk_trgt->silk_id);
+                silk__set_state(silk_trgt, SILK_STATE__BOOT);
+                SLIST_INSERT_HEAD(&engine->free_silks, silk_trgt, next_free);
+                printf("!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)\n");
+                // initialize stack context bcz the silk should start from a clean stack.
+                silk_create_initial_stack_context(&silk_trgt->exec_state,
+                                                  silk__main,
+                                                  silk_get_stack_from_id(engine, msg_silk_id),
+                                                  SILK_USEABLE_STACK(&engine->cfg));
+                // let the re-initialized silk to run till it awaits the START msg
+                ret = silk_send_msg_code(engine, SILK_MSG_BOOT, silk_trgt->silk_id);
+                assert(ret == SILK_STAT_OK);
+                /*
+                 * switch into the freshly initialized silk to make it run from silk__main()
+                 * until the first silk_yield(). it will then process the MSG_BOOT we've
+                 * just sent it & reach the point where it is ready to take a MSG_START
+                 * Note that once were on that silk, we'll use its fresh stack to pump 
+                 * the next msg
+                 * BEWARE: in some case we were already on that terminated silk & hence 
+                 * we work on the same stack but on lower addresses compared with whah we
+                 * now initialize.
+                 */
+                SILK_SWITCH(silk_trgt->exec_state, s->exec_state);
+                assert(0); // we should return from the switch.
+                continue;
+            }
+
+            /*
+             * check whether the silk is pending termination. if so then this is
+             * the time to execute !
+             */
+            if (unlikely(SILK_STATE(silk_trgt) == SILK_STATE__TERM)) {
+                SILK_DEBUG("dropping a msg bcz silk is killed, pending recycle");
+                continue;
+            }
+
             /*
              * swap context into the silk which received the msg.
              * BEWARE: 
              * 1) 's' was set in previous loop iteration & hence it has the older silk 
              * object, which executed the last msg
-             * 2) we must  optimize the case where we can skip switching from one instance to itself.
-             * otherwise, we'll send the "current" stack-pointer as target & save a 
-             * stack-pointer which is pushed into while saving the state. it will cause
-             * us to return on the stack as if "before" we saved the state. very bad !!!
+             * 2) we must  optimize the case where we can skip switching from one instance
+             *    to itself. otherwise, we'll send the "current" stack-pointer as 
+             *    target & save a stack-pointer which is pushed into while saving the
+             *    state. it will cause us to return on the stack as if "before" we saved
+             *    the state. very bad !!!
              */
-            msg_silk_id = exec_thr->last_msg.silk_id;
             if (likely(s->silk_id != msg_silk_id)) {
-                silk_trgt = &engine->silks[msg_silk_id];
-                SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
-                assert(silk_trgt->silk_id == msg_silk_id);
+                SILK_DEBUG("switching from Silk#%d to Silk#%d",
+                           s->silk_id, silk_trgt->silk_id);
                 SILK_SWITCH(silk_trgt->exec_state, s->exec_state);
                 SILK_DEBUG("switched into Silk#%d", s->silk_id);
             }
@@ -409,6 +472,19 @@ void silk_yield(struct silk_msg_t   *msg)
             engine->cfg.idle_cb(exec_thr);
         }
     } while (!is_msg_avail);
+}
+
+/*
+ * drain msgs of a silk instance indefinitely.
+ */
+__attribute__((noreturn)) void silk_drain_msgs()
+{
+    struct silk_msg_t    msg;
+    //enum silk_status_e   silk_stat;
+
+    do {
+        silk_yield(&msg);
+    } while (1);
 }
 
 /*
@@ -505,6 +581,7 @@ silk_dispatch(struct silk_engine_t   *engine,
 {
     enum silk_status_e   silk_stat;
 
+    SILK_DEBUG("dispatching Silk#%d", s->silk_id);
     assert(SILK_STATE(s) == SILK_STATE__ALLOC);
     silk_stat = silk_send_msg_code(engine, SILK_MSG_START, s->silk_id);
 
@@ -512,3 +589,65 @@ silk_dispatch(struct silk_engine_t   *engine,
 }
 
 
+/*
+ * a set of silk_kill_*() API's which will cause the silk instance to stop running & become
+ * free for new allocation.
+ * if the call is made for the same silk that is killed, then the call will NOT return.
+ * if the call is made for a different silk (than the caller) then:
+ *    the call returns
+ *    the killed silk will actually get killed only when it returns control to the scheduler
+ *        (i.e.: dies, terminates, or yields()).
+ */
+enum silk_status_e
+silk_eng_kill(struct silk_engine_t   *engine,
+              struct silk_t          *silk)
+{
+    //struct silk_msg_t    msg;
+    silk_id_t            my_id; // in case i'm in a silk context
+    enum silk_status_e   silk_status;
+    const uint32_t       silk_state = SILK_STATE(silk);
+
+
+    SILK_DEBUG("killing Silk#%d", silk->silk_id);
+    if (unlikely((silk_state == SILK_STATE__FREE) ||
+                 (silk_state == SILK_STATE__TERM))) {
+        SILK_DEBUG("silk %d is in state %d - no point killing it.",
+                   silk->silk_id, silk_state);
+        return SILK_STAT_OK;
+    }
+    if (silk_state == SILK_STATE__ALLOC) {
+        SILK_DEBUG("silk %d recycled into free list", silk->silk_id);
+        silk_eng_add_free_silk(engine, silk);
+        return SILK_STAT_OK;
+    }
+    assert(silk_state == SILK_STATE__RUN);
+    silk__set_state(silk, SILK_STATE__TERM);
+    if (/*struct silk_execution_thread_t */silk__my_thread_obj()) {
+        SILK_DEBUG("Silk#%d killed by silk thread", silk->silk_id);
+        my_id = silk__my_id();
+        if (my_id == silk->silk_id) {
+            SILK_DEBUG("Silk#%d killing itself", silk->silk_id);
+            silk_status = silk_send_msg_code(engine, SILK_MSG_TERM, silk->silk_id);
+            /*
+             * switch out so that the silk becomes inactive & can be recycled. we should
+             * never return from this call. we will consume all of the msgs destined to
+             * us until the MSG_TERM is poped & this will cause the scheduler to recycle
+             *  this silk
+             */
+            silk_drain_msgs();
+            assert(0);
+        } else {
+            /*
+             * Nothing more to do bcz we have a single processing thread. this means that the 
+             * other thread isnt running. we just need to wait for it to pop the TERM msg & recycle
+             * itself.
+             */
+            SILK_DEBUG("Silk#%d killed Silk#%d", my_id, silk->silk_id);
+            silk_status = SILK_STAT_OK;
+        }
+    } else {
+        SILK_DEBUG("Silk#%d killed by non silk thread", silk->silk_id);
+        silk_status = silk_send_msg_code(engine, SILK_MSG_TERM, silk->silk_id);
+    }
+    return silk_status;
+}
