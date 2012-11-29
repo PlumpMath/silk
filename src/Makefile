@@ -32,11 +32,26 @@ ut_kill.o: ut_kill.c $(LIB_HDR)
 ut_kill: ut_kill.o $(LIB_SILK)
 	gcc $(LFLAGS) ut_kill.o -o ut_kill $(LIBS) -L /home/bename/devel/silk-uthreads
 
-tests: run_n ping_pong ut_kill
+echo_server.o: echo_server.c echo_sample.h
+	gcc echo_server.c $(CFLAGS) $(CFLAGS_TESTS)
+
+echo_server: echo_server.o $(LIB_SILK)
+	gcc $(LFLAGS) echo_server.o -o echo_server $(LIBS) -L /home/bename/devel/silk-uthreads
+
+echo_client.o: echo_client.c echo_sample.h
+	gcc echo_client.c $(CFLAGS) $(CFLAGS_TESTS)
+
+echo_client: echo_client.o $(LIB_SILK)
+	gcc $(LFLAGS) echo_client.o -o echo_client $(LIBS) -L /home/bename/devel/silk-uthreads
+
+tests: run_n ping_pong ut_kill echo_server echo_client
 	echo "building all tests"
 
 clean:
-	rm -f *.o core TAGS $(LIB_SILK) run_n ping_pong ut_kill
+	rm -f *.o core $(LIB_SILK) run_n ping_pong ut_kill echo_server echo_client
+
+superclean: clean
+	rm -f TAGS cscope.out *~
 
 TAGS:
 	etags --output=TAGS *.c *.h

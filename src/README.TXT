@@ -1,6 +1,7 @@
 
 
 
+
 Important Design Decisions
 -------------------------------
 1) what happens when a silk instance returns from the entry function?
@@ -68,3 +69,4 @@ NOW !!!
 1) cleanup the drain_msgs()
 cleanup the FIX ME - do we remove the dual BOOT msgs required to boot/recycle a silk instance?
 3) when killing a silk, send a number (0-3) of msgs to that silk so that they are dropped properly.
+this will probably fail us & require a generation number in case a silk instance is reused & the second run takes a msg that was sent to the first one.
