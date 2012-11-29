@@ -14,7 +14,7 @@ should we first return to the Posix thread stack or do we continue to use the st
 Note this should be msg-q specific verification!!!
 
 4) upcoming improvemens
-a) silk_kill() - this will kill a silk so it will be recycled. if the caller is the one being terminated, it wont return from the call.
+a) 
 b) the msgs should have a generation number. a silk of Gen#N will drop any msg from generation K (K<N)
 consider how many bits are required for the generation to wrap-around.
 can we alloc/send/kill & make the full wrap-around?
@@ -43,3 +43,13 @@ test applications
 7) write a demo program of a network server that uses Silk.
 a simple "echo_server" which replies with whatever it is sent would be a nice example.
 it could be used as a skeleton by others to write their own servers.
+
+
+
+
+
+NOW !!!
+---------
+1) cleanup the drain_msgs()
+cleanup the FIX ME
+decide if MSG_TERM requires 2 or just 1 BOOT msgs

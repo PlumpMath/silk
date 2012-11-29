@@ -424,19 +424,36 @@ void silk_yield(struct silk_msg_t   *msg)
                 // let the re-initialized silk to run till it awaits the START msg
                 ret = silk_send_msg_code(engine, SILK_MSG_BOOT, silk_trgt->silk_id);
                 assert(ret == SILK_STAT_OK);
+                // TODO: the second msg should be sent only when we dont do SWITCH ????
+                ret = silk_send_msg_code(engine, SILK_MSG_BOOT, silk_trgt->silk_id);
+                assert(ret == SILK_STAT_OK);
                 /*
+                 * we've just sent BOOT msgs to the silk & now we need it to start running
+                 * from the entry function. 
+                 * Case 1: were recycling the silk who's stack is now in use
                  * switch into the freshly initialized silk to make it run from silk__main()
                  * until the first silk_yield(). it will then process the MSG_BOOT we've
                  * just sent it & reach the point where it is ready to take a MSG_START
                  * Note that once were on that silk, we'll use its fresh stack to pump 
                  * the next msg
-                 * BEWARE: in some case we were already on that terminated silk & hence 
+                 * BEWARE: in this case we are already on that terminated silk & hence 
                  * we work on the same stack but on lower addresses compared with whah we
                  * now initialize.
+                 * Case 2: were recycling a different silk instance the the one who's stack
+                 * is in use right now.
                  */
-                SILK_SWITCH(silk_trgt->exec_state, s->exec_state);
-                assert(0); // we should return from the switch.
-                continue;
+                if (s->silk_id == msg_silk_id) {
+                    // we recycle the silk on which we are currently running.
+                    SILK_SWITCH(silk_trgt->exec_state, s->exec_state);
+                    assert(0); // we should NOT return from the switch.
+                } else {
+                    /*
+                     * we recycle a silk when running on the stack of a different silk.
+                     * just continue pumping msgs & when the BOOT msg we just sent is poped
+                     * we will naturaly switch into that (recycled) silk & boot it.
+                     */
+                    continue;
+                }
             }
 
             /*
@@ -635,14 +652,16 @@ silk_eng_kill(struct silk_engine_t   *engine,
              *  this silk
              */
             silk_drain_msgs();
+            // TODO: consider just calling silk_yield(&msg); instead of drain()
             assert(0);
         } else {
+            silk_status = silk_send_msg_code(engine, SILK_MSG_TERM, silk->silk_id);
             /*
              * Nothing more to do bcz we have a single processing thread. this means that the 
              * other thread isnt running. we just need to wait for it to pop the TERM msg & recycle
              * itself.
              */
-            SILK_DEBUG("Silk#%d killed Silk#%d", my_id, silk->silk_id);
+            SILK_DEBUG("Silk#%d killed by Silk#%d", silk->silk_id, my_id);
             silk_status = SILK_STAT_OK;
         }
     } else {

@@ -102,6 +102,8 @@ struct silk_t {
     /*
      * the state of this silk
      * 2 bits : current state of silk object
+     * the silk is either transitions from FREE->ALLOC->RUN->TERM->FREE & at each
+     * point only ne can touch it so no need to lock access.
      */
     uint32_t                      state;
     // the unique silk_id of this instance
