@@ -43,6 +43,7 @@ silk_eng_add_free_silk(struct silk_engine_t       *engine,
     silk__set_state(s, SILK_STATE__FREE);
     pthread_mutex_lock(&engine->mtx);
     engine->num_free_silk++;
+    assert(engine->num_free_silk <= engine->cfg.num_silk);
     /*
      * push the terminated silk instance to head of queue. better for CPU cache behavior
      * p.s. : it will also reveal misuse of silk stack after its termination much faster.
@@ -78,6 +79,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
     silk__set_state(s, SILK_STATE__FREE);
     pthread_mutex_lock(&engine->mtx);
     engine->num_free_silk++;
+    assert(engine->num_free_silk <= engine->cfg.num_silk);
     pthread_mutex_unlock(&engine->mtx);
     
     do {
@@ -94,7 +96,8 @@ static void silk__main (void) /*__attribute__((no_return))*/
             SILK_INFO("silk %d starting", silk__my_id());
             silk__set_state(s, SILK_STATE__RUN);
             s->entry_func(s->entry_func_arg);
-            assert(SILK_STATE(s) == SILK_STATE__RUN);
+            assert((SILK_STATE(s) == SILK_STATE__RUN) ||// usual case
+                   (SILK_STATE(s) == SILK_STATE__TERM));// when killed but no yeild called since
 #if 1
             silk_eng_add_free_silk(engine, s);
 #else
@@ -412,6 +415,11 @@ void silk_yield(struct silk_msg_t   *msg)
              * point to switch into it. just recycle it.
              */
             if (unlikely(exec_thr->last_msg.msg == SILK_MSG_TERM)) {
+                if (unlikely(SILK_STATE(silk_trgt) == SILK_STATE__FREE)) {
+                    SILK_DEBUG("TERM msg processed by Silk#%d which is already free. skipping",
+                               silk_trgt->silk_id);
+                    continue;
+                }
                 SILK_DEBUG("recycling a terminated Silk#%d", silk_trgt->silk_id);
                 silk__set_state(silk_trgt, SILK_STATE__BOOT);
                 SLIST_INSERT_HEAD(&engine->free_silks, silk_trgt, next_free);
@@ -570,6 +578,7 @@ silk_alloc(struct silk_engine_t   *engine,
         s = SLIST_FIRST(&engine->free_silks);
         SLIST_REMOVE_HEAD(&engine->free_silks, next_free);
         engine->num_free_silk--;
+        assert(engine->num_free_silk > 0);
         SILK_DEBUG("allocated Silk#%d. still %d available",
                    s->silk_id, engine->num_free_silk);
         assert(SILK_STATE(s) == SILK_STATE__FREE);

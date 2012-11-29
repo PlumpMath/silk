@@ -1,12 +1,20 @@
 
 
 
-Questions
----------------------
+Important Design Decisions
+-------------------------------
 1) what happens when a silk instance returns from the entry function?
 if it finds more work than it simply switches to that instance while the one that ended returns to the free pool.
 if there's no work in the queue, we need to call the idle callback routine.
 should we first return to the Posix thread stack or do we continue to use the stack for calling the. if we dont switch then we need to make sure its safe to use the stack while it might be allocated for a new work. or should we just delay its push into the free list?
+The decision is to save the extra context switch & always use the stack of the last running silk to execute the IDLE routine.
+
+
+
+
+Questions
+---------------------
+1) 
 
 2) a silk must increase generation counter whenever it is recycled so that it wont process old mg from its previous lifetime.
 
@@ -14,10 +22,17 @@ should we first return to the Posix thread stack or do we continue to use the st
 Note this should be msg-q specific verification!!!
 
 4) upcoming improvemens
-a) need silk_join() so that a silk/thread can dispatch a silk & wait for its completion.
+a) need silk_join() so that a silk/thread can dispatch a silk & wait for its completion. completion should be designated as a callback function so it can implement signaling using (memory variables, msgs, mutex, cond_var, etc)
+This can be implemented naively by having a wrapper function that would call the actual function & then invoke/signal the completion. however, such a function needs to receive its own context (e.g.: a mutex to unlock or a variable to write to or a msg t osend, ...) & the question is where would this context be put & how is it transfered to the wrapper function.
+A solution can be done with a more basic infrastructure of dynamic memory allocation from the silk-private stack. since the stack grows downward (x86) we can define an API with which to allocate from the low addresses of the silk stack. as long as this allocation leaves enough space for the silk stack usage, there's no problem. detecting such collisions can be done with the Silk library writing a signature that separates the two regions so even though there is no real-time protection (as we have protection pages between silk instances) we can have the knowledge that this had happened so that we can increase the per-silk stack size. such silk-private memory obviously has the life-time of the silk instance (i.e.: it is freed when the silk is recycled).
+important use cases are:
+(*) allocate a structure of parameters that will be passed to the silk entry function. this prevents the need to manage such object for release when the silk that processes them completes.
+(*) allows writing wrapper functions that will be used as silk entry-point & wrap another silk entry-function. as each entry-function usually requires its extra-information (context), the context can be placed on the silk-private stack.
+
 b) the msgs should have a generation number. a silk of Gen#N will drop any msg from generation K (K<N)
 consider how many bits are required for the generation to wrap-around.
 can we alloc/send/kill & make the full wrap-around?
+
 c) the msg queue should become priority based. the priority range should be from config.h with some limitations.
                  should be split between internal/external. the internal one receives new msgs only by the engine itself & hence extracting a msg doesnt require a lock as long as its from the internal part.
                  should become buffer (page) based so that whole buffers can be moved from external queue to internal queue
@@ -52,4 +67,4 @@ NOW !!!
 ---------
 1) cleanup the drain_msgs()
 cleanup the FIX ME - do we remove the dual BOOT msgs required to boot/recycle a silk instance?
-
+3) when killing a silk, send a number (0-3) of msgs to that silk so that they are dropped properly.

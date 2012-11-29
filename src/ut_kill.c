@@ -113,7 +113,7 @@ enum silk_kill_code_path_e {
     SILK_KILL__OTHER_SILK_AND_YEILD,
 #endif
     //TODO: implement all kill code paths
-    SILK_KILL__LAST = SILK_KILL__OTHER_THREAD_AND_YEILD
+    SILK_KILL__LAST = SILK_KILL__OTHER_THREAD_AND_RET
 };
 
 enum recursion_depth_e {
@@ -249,12 +249,20 @@ ut_kill__recurse_n(int    *p_dummy,
             break;
 
         case SILK_KILL__OTHER_THREAD_AND_YEILD:
-            SILK_DEBUG("Silk#%d now waiting for another thread to kill itself",
+            SILK_DEBUG("Silk#%d now waiting for another thread to kill it",
                        silk__my_id());
             test_4.is_busy_waiting = true;
             wait_on_bool(&test_4.is_killed, true);
+            SILK_DEBUG("Silk#%d was killed - calling yield", silk__my_id());
             silk_yield(&msg);
             assert(0); // since were killed, we shoul NOT be back !!!
+            break;
+
+        case SILK_KILL__OTHER_THREAD_AND_RET:
+            SILK_DEBUG("Silk#%d now waiting for another thread to kill it", silk__my_id());
+            test_4.is_busy_waiting = true;
+            wait_on_bool(&test_4.is_killed, true);
+            SILK_DEBUG("Silk#%d was killed - do clean return", silk__my_id());
             break;
 
 #ifdef MULTI_THREAD_ENGINE
@@ -270,13 +278,6 @@ ut_kill__recurse_n(int    *p_dummy,
             assert(0); // we shouldnt get here
             break;
 #endif
-
-        case SILK_KILL__OTHER_THREAD_AND_RET:
-            SILK_DEBUG("Silk#%d now waiting to be killed", silk__my_id());
-            test_4.is_busy_waiting = true;
-            wait_on_bool(&test_4.is_killed, true);
-            SILK_DEBUG("Silk#%d was killed - do clean return", silk__my_id());
-            break;
 
         default:
             SILK_DEBUG("Invalid codepath:%d", test_4.code_path);
@@ -593,6 +594,7 @@ int main (int   argc, char **argv)
                     break;
 
                 case SILK_KILL__OTHER_THREAD_AND_YEILD:
+                case SILK_KILL__OTHER_THREAD_AND_RET:
                     wait_on_bool(&test_4.is_busy_waiting, true);
                     silk_stat = silk_eng_kill(&engine, s);
                     assert(silk_stat == SILK_STAT_OK);
