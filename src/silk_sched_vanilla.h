@@ -66,7 +66,7 @@ silk_sched_next_index(uint32_t       index)
     assert(index < MSG_QUEUE_SIZE);
     index ++;
     if (index == MSG_QUEUE_SIZE)
-	index = 0;
+        index = 0;
     return index;
 }
 
@@ -77,9 +77,9 @@ static inline bool
 _silk_sched_is_empty(struct silk_incoming_msg_queue_t      *q)
 {
     if (q->next_write == q->next_read) {
-	return true;
+        return true;
     } else {
-	return false;
+        return false;
     }
 }
 
@@ -100,9 +100,9 @@ static inline bool
 _silk_sched_is_full(struct silk_incoming_msg_queue_t      *q)
 {
     if (silk_sched_next_index(q->next_write) == q->next_read) {
-	return true;
+        return true;
     } else {
-	return false;
+        return false;
     }
 }
 
@@ -147,7 +147,7 @@ silk_sched_send(struct silk_incoming_msg_queue_t      *q,
         goto out;
     }
     q->msgs[q->next_write] = *msg;
-    q->next_write++;
+    q->next_write = silk_sched_next_index(q->next_write);
     silk_stat = SILK_STAT_OK;
 
  out:

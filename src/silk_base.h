@@ -40,6 +40,11 @@
 #define SILK_MIN_NUM_THREADS                        2
 
 /*
+ * This is the Silk ID of the instance which is used to start running when the engine comes up
+ */
+#define SILK_INITIAL_ID   0
+
+/*
  * various status/error codes
  */
 enum silk_status_e {

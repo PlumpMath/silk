@@ -14,10 +14,6 @@
  
 
 
-/*
- * This is the Silk ID of the instance which is used to start running when the engine comes up
- */
-#define SILK_INITIAL_ID   0
 
 
 /*
@@ -103,11 +99,17 @@ static void silk__main (void) /*__attribute__((no_return))*/
              */
             // TODO: we need to support a msg from Silk#A to terminate Silk#B
             
-        } else {
-            assert(msg.msg == SILK_MSG_TERM_THREAD);
-            
+        } else if (unlikely(msg.msg == SILK_MSG_TERM_THREAD)) {
             SILK_INFO("kernel thread %lu processing TERM msg", exec_thr->id);
             engine->terminate = true;
+        } else {
+            /*
+             * we've just poped a msg that was destined to a silk that doesnt expect it.
+             * we just drop it.
+             */
+            SILK_INFO("Got unexpected msg - dropping!!! msg={code=%d, id=%d, ctx=%p}",
+                      msg.msg, msg.silk_id, msg.ctx);
+
         }
     } while (likely(engine->terminate == false));
     SILK_INFO("thread %lu switching back to pthread stack", exec_thr->id);
@@ -402,8 +404,8 @@ void silk_yield(struct silk_msg_t   *msg)
             msg_silk_id = exec_thr->last_msg.silk_id;
             if (likely(s->silk_id != msg_silk_id)) {
                 silk_trgt = &engine->silks[msg_silk_id];
-                assert(silk_trgt->silk_id == msg_silk_id);
                 SILK_DEBUG("switching from Silk#%d to Silk#%d", s->silk_id, silk_trgt->silk_id);
+                assert(silk_trgt->silk_id == msg_silk_id);
                 SILK_SWITCH(silk_trgt->exec_state, s->exec_state);
                 SILK_DEBUG("switched into Silk#%d", s->silk_id);
             }

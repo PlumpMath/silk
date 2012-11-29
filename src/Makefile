@@ -1,6 +1,6 @@
-CFLAGS=-Wall -c -g -std=c99
+CFLAGS=-Wall  -Werror -c -g -std=c99
 CFLAGS_TESTS=-I.
-LFLAGS=-g -Wall -Werror
+LFLAGS=-g -Wall
 LIBS=-l pthread -l silk
 LIB_SRC=silk_context.c silk_engine.c silk_tls.c
 LIB_HDR=silk_base.h  silk_context.h  silk.h  silk_sched.h  silk_sched_vanilla.h  silk_tls.h
@@ -20,11 +20,17 @@ run_n.o: run_n.c $(LIB_HDR)
 run_n: run_n.o $(LIB_SILK)
 	gcc $(LFLAGS) run_n.o -o run_n $(LIBS) -L /home/bename/devel/silk-uthreads
 
-tests: run_n
+ping_pong.o: ping_pong.c $(LIB_HDR)
+	gcc ping_pong.c $(CFLAGS) $(CFLAGS_TESTS)
+
+ping_pong: ping_pong.o  $(LIB_SILK)
+	gcc $(LFLAGS) ping_pong.o -o ping_pong $(LIBS) -L /home/bename/devel/silk-uthreads
+
+tests: run_n ping_pong
 	echo "building all tests"
 
 clean:
-	rm -f *.o core TAGS $(LIB_SILK) run_n
+	rm -f *.o core TAGS $(LIB_SILK) run_n ping_pong
 
 TAGS:
 	etags --output=TAGS *.c *.h
