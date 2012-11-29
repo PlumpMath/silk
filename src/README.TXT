@@ -11,6 +11,7 @@ should we first return to the Posix thread stack or do we continue to use the st
 2) a silk must increase generation counter whenever it is recycled so that it wont process old mg from its previous lifetime.
 
 3) the msg queue must be at least the size of num_silk to contain the per-silk SILK_MSG_BOOT
+Note this should be msg-q specific verification!!!
 
 4) 
 

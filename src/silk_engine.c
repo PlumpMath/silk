@@ -182,34 +182,7 @@ silk_thread_init (struct silk_execution_thread_t        *exec_thr,
     return SILK_STAT_OK;
 }
 
-/*
- * send a msg object into the engine msg queue
- */
-static inline enum silk_status_e
-silk_send_msg (struct silk_engine_t                  *engine,
-               struct silk_msg_t                     *msg)
-{
-    enum silk_status_e    silk_stat;
 
-    SILK_DEBUG("send msg={code=%d, id=%d, ctx=%p", msg->msg, msg->silk_id, msg->ctx);
-    silk_stat = silk_sched_send(&engine->msg_sched, msg);
-    return silk_stat;
-}
-
-/*
- * send a msg code into the engine msg queue
- */
-static inline enum silk_status_e
-silk_send_msg_code (struct silk_engine_t                  *engine,
-                    enum silk_msg_code_e                  msg_code,
-                    uint32_t                              silk_id)
-{
-    struct silk_msg_t        msg = {
-        .msg = msg_code,
-        .silk_id = silk_id,
-    };
-    return silk_send_msg (engine, &msg);
-}
  
 static inline enum silk_status_e
 silk_eng_terminate (struct silk_execution_thread_t       *exec_thr)
@@ -414,7 +387,7 @@ void silk_yield(struct silk_msg_t   *msg)
         if (silk_sched_get_next(&exec_thr->engine->msg_sched, &exec_thr->last_msg)) {
             {// debugging aid
                 struct silk_msg_t                     *msg = &exec_thr->last_msg;
-                SILK_DEBUG("recv msg={code=%d, id=%d, ctx=%p", msg->msg, msg->silk_id, msg->ctx);
+                SILK_DEBUG("recv msg={code=%d, id=%d, ctx=%p}", msg->msg, msg->silk_id, msg->ctx);
             }
             /*
              * swap context into the silk which received the msg.
