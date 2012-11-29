@@ -76,7 +76,6 @@ struct silk_engine_param_t {
 #define SILK_STATE__BOOT    0x0 // the silk boots (i.e.: hasnt reached the point it can process msg)
 #define SILK_STATE__FREE    0x1 // free for anyone to allocate
 #define SILK_STATE__ALLOC   0x2 // allocated but hasnt started running yet
-// do we need SILK_STATE_IGNITE ?
 #define SILK_STATE__RUN     0x3 // running, not terminated/exited yet
 #define SILK_STATE__TERM    0x4 // terminated, pending recycle to make it FREE
 #define SILK_STATE__LAST    0x4

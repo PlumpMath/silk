@@ -20,8 +20,6 @@
  *
  * TODO the below control macros should be used from a configure script.
  */
-//#define SILK_CONTEXT__LIBC
-#define SILK_CONTEXT__MINIMAL
 
 
 /*

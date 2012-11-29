@@ -9,7 +9,7 @@
 /*
  * The first scheduler is a very basic one with which we develop the core library. it is:
  * 1) fixed size for msg instance & the whole msg queue.
- * 2) queue access requires a lock
+ * 2) queue access requires a mutex lock
  * 3) queue is processed with strict order of FIFO
  * 4) when terminated, will process the whole queue until it pops the SILK_MSG_TERM_THREAD msg
  *

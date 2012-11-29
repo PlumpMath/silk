@@ -8,6 +8,7 @@
 #ifndef __SILK_TLS_H__
 #define __SILK_TLS_H__
 
+#include "config.h"
 #include <assert.h>
 
 /*
@@ -22,10 +23,6 @@ enum silk_tls_id_e {
     SILK_TLS__MAX,
 };
 
-/*
- * select a TLS implementation, whether pthreads or compiler support.
-*/
-//#define SILK_TLS__THREAD_SPECIFIC
 
 #ifdef SILK_TLS__THREAD_SPECIFIC
 

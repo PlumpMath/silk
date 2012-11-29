@@ -68,7 +68,7 @@ static void silk__main (void) /*__attribute__((no_return))*/
         // wait for the START msg
         silk_yield(&msg);
         /* 
-         *handle the 3 possible msgs using "if" rather than "switch" bcz the
+         * handle the 3 possible msgs using "if" rather than "switch" bcz the
          * probability of each is drastically lower than the one checked before hand.
          */
         if (likely(msg.msg == SILK_MSG_START)) {
@@ -85,9 +85,9 @@ static void silk__main (void) /*__attribute__((no_return))*/
             pthread_mutex_unlock(&engine->mtx);
             SILK_INFO("silk %d ended", silk__my_id());
             /*
-              push the terminated silk instance to head of queue. better for CPU cache behavior
-              * p.s. : it will also reveal misuse of silk stack after its termination much faster.
-              */
+             * push the terminated silk instance to head of queue. better for CPU cache behavior
+             * p.s. : it will also reveal misuse of silk stack after its termination much faster.
+             */
             SLIST_INSERT_HEAD(&engine->free_silks, s, next_free);
         } else if (likely(msg.msg == SILK_MSG_TERM)) {
             SILK_INFO("Silk#%d processing TERM msg", s->silk_id);
@@ -109,27 +109,19 @@ static void silk__main (void) /*__attribute__((no_return))*/
              */
             SILK_INFO("Got unexpected msg - dropping!!! msg={code=%d, id=%d, ctx=%p}",
                       msg.msg, msg.silk_id, msg.ctx);
-
         }
     } while (likely(engine->terminate == false));
     SILK_INFO("thread %lu switching back to pthread stack", exec_thr->id);
-#if 1
     SILK_SWITCH(exec_thr->exec_state, s->exec_state);
-#else
-#if defined (__i386__)
-    silk_swap_stack_context(exec_thr->exec_state.esp, &s->exec_state.esp);
-#elif defined (__x86_64__)
-#error "not implemented"
-    // it should be of the form:
-    silk_swap_stack_context(&exec_thr->exec_state, &s->exec_state);
-#endif
-#endif //SILK_SWITCH()
 }
 
 /*
  * This is the entry function for a pthread that is used to execute uthreads.
- * we first switch into a uthread & then jump from one uthread to another WITHOUT ever going back to the pthread-provided stack (we might want that for IDLE callback processing)
- * when the engine is terminated, the thread will switch from the last uthread is executed to the original pthread stack frame (in which this function started to execute) & this function will then return & terminate the posix thread.
+ * we first switch into a uthread & then jump from one uthread to another WITHOUT ever 
+ * going back to the pthread-provided stack (we might want that for IDLE callback processing)
+ * when the engine is terminated, the thread will switch from the last uthread is executed to
+ * the original pthread stack frame (in which this function started to execute) & this
+ * function will then return & terminate the posix thread.
  */
 static void *silk__thread_entry(void *ctx)
 {
@@ -146,24 +138,19 @@ static void *silk__thread_entry(void *ctx)
      * switch into one silk (no matter which) to start processing msgs. from that
      * point onwards, we'll only switch from one silk to another without ever 
      * switching back to the original pthread-provided stack.
+     * although any silk instance would do, we take the INITIAL_ID bcz it is 
+     * implicitly processing a BOOT msg so the initialization could dropsa BOOT
+     *  msg destined to the the INITIAL_ID
      * p.s.
      * one might want to consider calling the IDLE function using the pthread stack.
-     * but this implies a little extra overhead.
+     * but this implies a little extra overhead. it might be worth it in case that
+     * IDLE work requires a much larger stack than the one used by the silks (increasing
+     *  the stack for all silks would be a huge waste of memory).
      * BEWARE: we are swapping into a silk which is designated "free" & use its stack
      * for our execution until we switch into a silk for processng its msg.
      */
     s = silk_get_ctrl_from_id(engine, silk_id);
-#if 1
     SILK_SWITCH(s->exec_state, exec_thr->exec_state);
-#else
-#if defined (__i386__)
-    silk_swap_stack_context(s->exec_state.esp, &exec_thr->exec_state.esp);
-#elif defined (__x86_64__)
-#error "not implemented"
-    // it should be of the form:
-    silk_swap_stack_context(&s->exec_state, &exec_thr->exec_state);
-#endif
-#endif //SILK_SWITCH()
     // we get here only if the engine is terminating !!!
     SILK_INFO("Thread exiting. id=%lu", exec_thr->id);
     return NULL;
@@ -185,14 +172,20 @@ silk_thread_init (struct silk_execution_thread_t        *exec_thr,
 }
 
 
- 
+/*
+ * request the engine to terminate gracefully.
+ */
 static inline enum silk_status_e
 silk_eng_terminate (struct silk_execution_thread_t       *exec_thr)
 {
     return silk_send_msg_code(exec_thr->engine, SILK_MSG_TERM_THREAD, 0/* doesnt matter - its for the engine itself*/);
 }
- 
 
+/*
+ * wait for the internal thread to terminate & only then return. this ensures the
+ * caller that once the API returns, it can free whatever resources were bound to
+ * the engine.
+ */
 enum silk_status_e
 silk_eng_join (struct silk_execution_thread_t                    *exec_thr)
 {
@@ -307,7 +300,7 @@ silk_init (struct silk_engine_t               *engine,
         /*
          * ask each silk to boot into the place they all wait for msgs
          * The first msg causes the scheduler to switch into it. it then runs from the 
-         * beggining os silk__main() up to the first silk_yield() where it joins all
+         * beggining of silk__main() up to the first silk_yield() where it joins all
          * silks awaiting control msgs. however, the msg itself wasnt processed bcz
          * it was lost when we switched into silk_main() which isnt built to retrieve
          * the msg which cause the context-switch into it.

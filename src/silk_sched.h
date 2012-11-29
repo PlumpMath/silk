@@ -10,7 +10,8 @@
  * 1) simple linear msg queue
  * 2) a highly efficient multi-processor msg queue.
  * 3) priority based msg queue
- * 4) a queue with application-specific decision logic
+ * 4) a queue with application-specific decision logic (e.g.: select next silk 
+ *    based on various parameters rather than by the msg priority).
  */
 
 /*

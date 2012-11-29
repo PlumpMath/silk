@@ -1,6 +1,7 @@
 /*
  * Copyight (C) Eitan Ben-Amos, 2012
  */
+#include "config.h"
 #include <assert.h>
 #include "silk_context.h"
 
@@ -14,8 +15,64 @@ int swapcontext(ucontext_t *oucp, ucontext_t *ucp);
 
 #elif defined (SILK_CONTEXT__MINIMAL)
 
-#if defined (__i386__)
 
+/*
+ * Important x86 (32/64 bit) notes
+ * X86 has 8 registers (E{AX, BX, CX, DX, SI, DI, BP, SP} while x86-64 has 16 registers (R0 .. R15]
+ * of which the first 8 are the same as the old ones (EAX, …) while the higher 8 are new & are
+ * named only in this way (i.e.: R8 .. R15)
+ * The registers naming convention is like so:
+ * REX indicate word size of an opcode:
+ *               R = 64-bit (e.g.: RAX)
+ *               E = 32-bit (e.g.: EAX)
+ *               <NONE> = 16 bit (e.g.: AX)
+ *               L = 8 bit (e.g.: AL)
+ *               RA{b,w,d,<none>} can be used to uniformly name a register with a eidth of
+ *                  {8,16,32,64} bit respectively
+ * See full register naming table @ http://msdn.microsoft.com/en-us/library/windows/hardware/ff561499(v=vs.85).aspx
+ * The x86-64 also has:
+ *         Eight 80-bit x87 registers (floating point).
+ *         Eight 64-bit MMX registers. (These overlap with the x87 registers.)
+ *         The original set of eight 128-bit SSE registers is increased to sixteen.
+ *         AVX register (256-bit wide)
+ * different applications might require different registers to be saved in the context.
+ * Always make sure we have enough space for the Red Zone (128 byte with GCC)
+ *
+ *
+ * For System V sytems (Gnu/Linux, Solaris, FreeBSD, etc) the ABI states that:
+ * [IA-32]
+ *     1) EBX, ESI, EDI registers are “callee-saved” – callee mustn’t change these. If it changes
+ *        these than it must restore them to old values before returning.
+ *     2) EAX, EDX, ECX registers are “caller-saved” – caller saves these if it wants to preserve
+ *        them after a function-call retuns.
+ *     3) Using the “fastcall” calling convention, GCC places the first 2 function parameters in
+ *        registers ECX (first) & EDX (second).
+ *     4) Using the standard calling convention, ALL parameters are on the stack. They are pushed
+ *        in reversed order from their order in the argument list. Furthermore, all parameters are
+ *        multiples of DWORD (32-bit) size.
+ *     5) example for accessing function arguments in the caller for the function:
+ *        “int fee(int fie, char foe, double fum)” is :
+ *        i) use the EBP with an offset equal to 4 * (n + 2), where n is the number of the parameter
+ *           in the argument list (not the number in the order it was pushed by), zero-indexed. The +2
+ *           is an added offset for the calling function's saved frame pointer and return pointer
+ *           (pushed automatically by CALL, and popped by RET).
+ *           so 32-bit assembly would like like so:
+ *               mov ecx, [ebp + 8]  ; fie
+ *               mov bl,  [ebp + 12] ; foe
+ *               mov edx, [ebp + 16] ; high dword of fum
+ *               mov eax, [ebp + 20] ; low dword of fum
+ *           This will move fie into ECX, foe into BL, and fum into EAX and EDX
+ *
+ * [x86-64]
+ *     1) The registers RDI, RSI, RDX, RCX, R8, and R9 are used for integer and memory address
+ *        arguments. Only the 7-th arguments & onwards are passed using the stack
+ *     2) Registers rbp, rbx and r12 through r15 “belong” to the calling function and the called
+ *        function is required to preserve their values. In other words, a called function must
+ *        preserve these registers’ values for its caller. Remaining registers “belong” to the 
+ *        called function.
+ *
+ */
+#if defined (__i386__)
 
 #if 0
 /*
@@ -144,6 +201,19 @@ void silk_create_initial_stack_context(struct silk_exec_state_t *initial_ctx,
     initial_ctx->rsp = p;
 }
 
+/*
+ * The general structure here (x86-64) is:
+ *     1) function takes 2 arguments, which are passed in RDI (first) & RSI (second). The C prototype
+ *        is “void silk_switch_ctx (strcut silk_context_t  *switch_from, strcut silk_context_t  *switch_to);”
+ *     2) save registers of context A into a buffer pointed by register RDI
+ *     3) switch stack pointer
+ *     4) restore registers of context B from a buffer pointed by register RSI*
+ * The registers we save are the stack pointer & all those that “belong” to caller !!! the rest of
+ * the registers “belong” the the callee & hence the code which calls this function already saved them.
+ *
+ * BEWARE: 
+ * we ignore floating-point, MMX & AVX registers here !!!
+ */
 void silk_swap_stack_context(struct silk_exec_state_t *switch_from, 
                              struct silk_exec_state_t *switch_to)
 {

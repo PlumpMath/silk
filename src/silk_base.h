@@ -7,8 +7,8 @@
 #define __SILK_BASE_H__
 
 
+#include "config.h"
 #include <syslog.h>
-
 
 
 // TODO: see if these have some std definition somewhere.

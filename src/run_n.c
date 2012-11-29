@@ -2,7 +2,7 @@
  * Copyight (C) Eitan Ben-Amos, 2012
  *
  * A small test program to dispatch N silks & watch their context switching.
- * This means for initial development of the library & basic sanity further on.
+ * This was meant for initial development of the library & basic sanity further on.
  * it also shows how the number of free silks decreases due to their 
  * allocation & increases when they terminate.
  */
@@ -37,22 +37,20 @@ int    num_yields = DEFAULT_NUM_YIELD_PER_SILK;
 
 
 /*
- * a ping pong example to measure performance of silk scheduling.
+ * a simplest example to create a few silks & show the library's scheduling.
  */
 static void
-ping_pong_idle_cb (struct silk_execution_thread_t   *exec_thr)
+run_n__idle_cb (struct silk_execution_thread_t   *exec_thr)
 {
     struct silk_engine_t                   *engine = exec_thr->engine;
 
     assert(engine->cfg.ctx == NULL);
-    printf("ping pong idle\n");
+    printf("run_n idle\n");
     sleep(1); // sleep for 1 sec
-
-    // TODO: replace with real code. for now just exit after some time
 }
 
 static void
-ping_pong_entry_func (void *_arg)
+run_n__entry_func (void *_arg)
 {
     struct silk_t                  *s = silk__my_ctrl();
     struct silk_msg_t   msg;
@@ -92,7 +90,7 @@ int main (int   argc, char **argv)
         .num_stack_pages = 16,
         .num_stack_seperator_pages = 4,
         .num_silk = DEFAULT_NUM_SILKS,
-        .idle_cb = ping_pong_idle_cb,
+        .idle_cb = run_n__idle_cb,
         .ctx = NULL,
     };
     struct silk_engine_t   engine;
@@ -124,7 +122,7 @@ int main (int   argc, char **argv)
     silk_stat = silk_init(&engine, &silk_cfg);
     printf("Silk initialization returns:%d\n", silk_stat);
     for (i=0; i < num_silk; i++) {
-        silk_stat = silk_alloc(&engine, ping_pong_entry_func, (void*)i, &s);
+        silk_stat = silk_alloc(&engine, run_n__entry_func, (void*)i, &s);
         assert(silk_stat == SILK_STAT_OK);
         printf("allocacated silk No %d\n", s->silk_id);
         silk_stat = silk_dispatch(&engine, s);
