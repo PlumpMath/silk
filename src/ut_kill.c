@@ -113,7 +113,7 @@ enum silk_kill_code_path_e {
     SILK_KILL__OTHER_SILK_AND_YEILD,
 #endif
     //TODO: implement all kill code paths
-    SILK_KILL__LAST = SILK_KILL__OTHER_SILK_ON_YEILD//SILK_KILL__OTHER_THREAD_AND_YEILD,
+    SILK_KILL__LAST = SILK_KILL__OTHER_SILK_ON_RET//SILK_KILL__OTHER_THREAD_AND_YEILD,
 
 };
 
@@ -135,6 +135,8 @@ struct test_4_param_t {
     bool     has_called_yield;
     // other thread killing
     bool     is_busy_waiting;
+    bool     is_terminating;
+    bool     is_dispatched;
 } volatile test_4 = {
     .code_path = SILK_KILL__INVALID,
 };
@@ -209,7 +211,13 @@ static void
 ut_kill__recurse_n(int    *p_dummy,
                    int     how_many)
 {
+    /*
+     * use a static object so the "code_path" which uses it wont use a different amount
+     * of stack
+     */
+    static struct silk_msg_t  msg;
     int my_dummy = 0;
+
 
     if (how_many == 1) {
         test_4.bottom_stack_frame_addr = &my_dummy;
@@ -221,28 +229,32 @@ ut_kill__recurse_n(int    *p_dummy,
             assert(0); // we shouldnt get here
             break;
 
-        case SILK_KILL__OTHER_SILK_ON_YEILD: {
-            struct silk_msg_t  msg;
-
+        case SILK_KILL__OTHER_SILK_ON_YEILD:
             test_4.has_called_yield = true;
             SILK_DEBUG("calling yield");
             silk_yield(&msg);
-        }
+            break;
+
+        case SILK_KILL__OTHER_SILK_ON_RET:
+            SILK_DEBUG("Silk#%d now waiting for a second silk to be dispatched (to issue the killed)",
+                       silk__my_id());
+            test_4.is_busy_waiting = true;
+            wait_on_bool(&test_4.is_dispatched, true);
+            /*
+             * note that since silks are serialized, as we signal that we terminate we will
+             * actually terminate __before__ another silk (the one created to kill us) has
+             * a chance to run.
+             */
+            test_4.is_terminating = true;
+            SILK_DEBUG("i'm returning (i.e.: silk terminates naturaly)");
             break;
 
 #ifdef MULTI_THREAD_ENGINE
-        case SILK_KILL__OTHER_SILK_AND_RET:
-            SILK_DEBUG("I'm now waiting to be killed");
-            test_4.is_busy_waiting = true;
-            wait_on_bool(&test_4.is_killed, true);
-            SILK_DEBUG("i was killed - do clean return");
-            break;
-
         case SILK_KILL__OTHER_SILK_AND_YEILD:
-            SILK_DEBUG("I'm now waiting to be killed");
+            SILK_DEBUG("Silk#%d now waiting to be killed", silk__my_id());
             test_4.is_busy_waiting = true;
             wait_on_bool(&test_4.is_killed, true);
-            SILK_DEBUG("i was killed - do yield");
+            SILK_DEBUG("Silk#%d was killed - do yield", silk__my_id());
             {
                 struct silk_msg_t   msg;
                 silk_yield(&msg);
@@ -252,10 +264,10 @@ ut_kill__recurse_n(int    *p_dummy,
 #endif
 
         case SILK_KILL__OTHER_THREAD_AND_RET:
-            SILK_DEBUG("I'm now waiting to be killed");
+            SILK_DEBUG("Silk#%d now waiting to be killed", silk__my_id());
             test_4.is_busy_waiting = true;
             wait_on_bool(&test_4.is_killed, true);
-            SILK_DEBUG("i was killed - do clean return");
+            SILK_DEBUG("Silk#%d was killed - do clean return", silk__my_id());
             break;
 
         default:
@@ -521,12 +533,16 @@ int main (int   argc, char **argv)
                 test_4.is_busy_waiting = false;
                 test_4.is_killed = false;
                 test_4.has_called_yield = false;
+                test_4.is_terminating = false;
+                test_4.is_dispatched = false;
 
                 // dipatch the first silk (to be killed in some way)
                 silk_stat = silk_alloc(&engine, ut_kill__main,
                                        (void*)SHALLOW_DEEP_RECURSION_STACK, &s);
                 assert(silk_stat == SILK_STAT_OK);
-                assert(s->silk_id == expected_silk_id);
+                if (test_4.code_path != SILK_KILL__OTHER_SILK_ON_RET) {
+                    assert(s->silk_id == expected_silk_id);
+                }
                 silk_stat = silk_dispatch(&engine, s);
                 assert(silk_stat == SILK_STAT_OK);
                 test_4.is_killed = false;
@@ -546,11 +562,25 @@ int main (int   argc, char **argv)
                     SILK_DEBUG("Silk#%d killed Silk#%d", s2->silk_id, s->silk_id);
                     break;
 
-                case SILK_KILL__OTHER_THREAD_AND_RET:
+                case SILK_KILL__OTHER_SILK_ON_RET:
                     wait_on_bool(&test_4.is_busy_waiting, true);
-                    silk_stat = silk_eng_kill(&engine, s);
+                    silk_stat = silk_alloc(&engine, ut_kill__kill_other_silk, s, &s2);
                     assert(silk_stat == SILK_STAT_OK);
-                    test_4.is_killed = true;
+                    /*
+                     * in this code path, the 2 silks we allocate are freed in opposite order
+                     * however, since each code-path is executed twice, the 2 silks are
+                     * switched twice & hence return to the same (initial) order
+                     */
+                    if (depth == DEPTH_SHALLOW) {
+                        assert(s2->silk_id != expected_silk_id);
+                    } else {
+                        assert(s2->silk_id == expected_silk_id);
+                    }
+                    SILK_DEBUG("start another silk (#%d) to kill the first one after it would be killed", s2->silk_id);
+                    silk_stat = silk_dispatch(&engine, s2);
+                    assert(silk_stat == SILK_STAT_OK);
+                    test_4.is_dispatched = true;
+                    wait_on_bool(&test_4.is_terminating, true);
                     break;
 
 #ifdef MULTI_THREAD_ENGINE
@@ -595,14 +625,33 @@ int main (int   argc, char **argv)
                 }
             } // for (depth ...
 
-            if (rep > 0) {
-                SILK_DEBUG("verifying stack addresses are identical to previous run");
-                assert(prev_top == test_4.top_stack_frame_addr);
-                assert(prev_bottom == test_4.bottom_stack_frame_addr);
+            /*
+             * The first iteration of teh first permutation saves stack usage. these are
+             * compared on the next iteratins/permutations.
+             */
+            if ((rep == 0) && (test_4.code_path == SILK_KILL__FIRST)) {
+                // save stack addresses for comparison in next test iteration
+                SILK_DEBUG("saving stack addresses to compare on next runs");
+                prev_top = test_4.top_stack_frame_addr;
+                prev_bottom = test_4.bottom_stack_frame_addr;
+            } else {
+                /*
+                 * the case which causes the silks to change order obviously changes the 
+                 * addresses
+                 */
+                if (test_4.code_path != SILK_KILL__OTHER_SILK_ON_RET) {
+                    SILK_DEBUG("verifying stack addresses are identical to previous run");
+                    assert(prev_top == test_4.top_stack_frame_addr);
+                    assert(prev_bottom == test_4.bottom_stack_frame_addr);
+                } else {
+                    /*
+                     * since Silk#0 & Silk#1 changed roles between SHALLOW & DEEP cases, we
+                     * can compensate with the silk instance stack size.
+                     */
+                    assert(prev_top == test_4.top_stack_frame_addr - SILK_PADDED_STACK(param));
+                    assert(prev_bottom == test_4.bottom_stack_frame_addr - SILK_PADDED_STACK(param));
+                }
             }
-            // save stack addresses for comparison in next test iteration
-            prev_top = test_4.top_stack_frame_addr;
-            prev_bottom = test_4.bottom_stack_frame_addr;
         } // for (code_path ...
     } // for (rep ...
 

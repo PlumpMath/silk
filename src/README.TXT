@@ -14,7 +14,7 @@ should we first return to the Posix thread stack or do we continue to use the st
 Note this should be msg-q specific verification!!!
 
 4) upcoming improvemens
-a) 
+a) need silk_join() so that a silk/thread can dispatch a silk & wait for its completion.
 b) the msgs should have a generation number. a silk of Gen#N will drop any msg from generation K (K<N)
 consider how many bits are required for the generation to wrap-around.
 can we alloc/send/kill & make the full wrap-around?
@@ -51,5 +51,5 @@ it could be used as a skeleton by others to write their own servers.
 NOW !!!
 ---------
 1) cleanup the drain_msgs()
-cleanup the FIX ME
-decide if MSG_TERM requires 2 or just 1 BOOT msgs
+cleanup the FIX ME - do we remove the dual BOOT msgs required to boot/recycle a silk instance?
+

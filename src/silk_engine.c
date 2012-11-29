@@ -424,9 +424,6 @@ void silk_yield(struct silk_msg_t   *msg)
                 // let the re-initialized silk to run till it awaits the START msg
                 ret = silk_send_msg_code(engine, SILK_MSG_BOOT, silk_trgt->silk_id);
                 assert(ret == SILK_STAT_OK);
-                // TODO: the second msg should be sent only when we dont do SWITCH ????
-                ret = silk_send_msg_code(engine, SILK_MSG_BOOT, silk_trgt->silk_id);
-                assert(ret == SILK_STAT_OK);
                 /*
                  * we've just sent BOOT msgs to the silk & now we need it to start running
                  * from the entry function. 
@@ -452,6 +449,8 @@ void silk_yield(struct silk_msg_t   *msg)
                      * just continue pumping msgs & when the BOOT msg we just sent is poped
                      * we will naturaly switch into that (recycled) silk & boot it.
                      */
+                    ret = silk_send_msg_code(engine, SILK_MSG_BOOT, silk_trgt->silk_id);
+                    assert(ret == SILK_STAT_OK);
                     continue;
                 }
             }
