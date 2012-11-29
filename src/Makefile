@@ -1,6 +1,6 @@
-CFLAGS=-Wall  -Werror -c -g -std=c99
+CFLAGS=-Wall  -Werror -c -g -std=c99 -Ofast
 CFLAGS_TESTS=-I.
-LFLAGS=-g -Wall
+LFLAGS=-g -Wall -Ofast
 LIBS=-l pthread -l silk
 LIB_SRC=silk_context.c silk_engine.c silk_tls.c
 LIB_HDR=silk_base.h  silk_context.h  silk.h  silk_sched.h  silk_sched_vanilla.h  silk_tls.h

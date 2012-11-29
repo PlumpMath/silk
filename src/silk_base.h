@@ -7,6 +7,10 @@
 #define __SILK_BASE_H__
 
 
+#include <syslog.h>
+
+
+
 // TODO: see if these have some std definition somewhere.
 #define likely(x)    __builtin_expect(!!(x), 1)
 #define unlikely(x)  __builtin_expect(!!(x), 0)
@@ -17,10 +21,18 @@
 // TODO: platform adaptation facilities
 #include <stdio.h>
 
-#define SILK_ERROR(fmt, ...)   printf("ERR :" fmt "\n", ## __VA_ARGS__)
-#define SILK_WARN(fmt, ...)    printf("WARN:" fmt "\n", ## __VA_ARGS__)
-#define SILK_INFO(fmt, ...)    printf("INFO:" fmt "\n", ## __VA_ARGS__)
-#define SILK_DEBUG(fmt, ...)   printf("DBG :" fmt "\n", ## __VA_ARGS__)
+/*
+ * Use syslog macros to decide on the debugging level for SILK
+ */
+#define SILK_LOG_LEVEL    LOG_DEBUG // for development
+//#define SILK_LOG_LEVEL    LOG_ERR // for performance measurements
+
+#define SILK_ERROR(fmt, ...)   do { if (SILK_LOG_LEVEL >= LOG_ERR) {printf("ERR :" fmt "\n", ## __VA_ARGS__); }} while (0);
+#define SILK_WARN(fmt, ...)    do { if (SILK_LOG_LEVEL >= LOG_WARNING) {printf("WARN:" fmt "\n", ## __VA_ARGS__); }} while (0);
+#define SILK_NOTICE(fmt, ...)  do { if (SILK_LOG_LEVEL >= LOG_NOTICE) {printf("NOTC:" fmt "\n", ## __VA_ARGS__); }} while (0);
+#define SILK_INFO(fmt, ...)    do { if (SILK_LOG_LEVEL >= LOG_INFO) {printf("INFO:" fmt "\n", ## __VA_ARGS__); }} while (0);
+#define SILK_DEBUG(fmt, ...)   do { if (SILK_LOG_LEVEL >= LOG_DEBUG) {printf("DBG :" fmt "\n", ## __VA_ARGS__); }} while (0);
+
 
 #define PAGE_SIZE    (4*1024)
 
