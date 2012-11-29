@@ -289,7 +289,8 @@ ut_kill__main(void *_arg)
     int my_dummy = 0;
 
 
-    SILK_DEBUG("%s: Silk#%d starts... (oper=%d)", __func__, s->silk_id, oper);
+    SILK_DEBUG("%s: Silk#%d starts... (oper=%d, stack=%p)",
+               __func__, s->silk_id, oper, &oper);
     switch (oper){
     case INFINITE_BUSY_WAIT_AND_EXIT:
         SILK_DEBUG("looping indefenitely doing busy wait, waiting for exit signal");
@@ -368,7 +369,7 @@ int main (int   argc, char **argv)
         // it's possible to select an address or let the library choose
         //.stack_addr = (void*)NULL,
         .stack_addr = (void*)0xb0000000,
-        .num_stack_pages = 16,
+        .num_stack_pages = 32,
         .num_stack_seperator_pages = 4,
         .num_silk = DEFAULT_NUM_SILKS,
         .idle_cb = ut_kill__idle_cb,
@@ -648,8 +649,8 @@ int main (int   argc, char **argv)
                      * since Silk#0 & Silk#1 changed roles between SHALLOW & DEEP cases, we
                      * can compensate with the silk instance stack size.
                      */
-                    assert(prev_top == test_4.top_stack_frame_addr - SILK_PADDED_STACK(param));
-                    assert(prev_bottom == test_4.bottom_stack_frame_addr - SILK_PADDED_STACK(param));
+                    assert(prev_top == test_4.top_stack_frame_addr - SILK_PADDED_STACK(&engine.cfg));
+                    assert(prev_bottom == test_4.bottom_stack_frame_addr - SILK_PADDED_STACK(&engine.cfg));
                 }
             }
         } // for (code_path ...

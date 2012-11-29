@@ -3,7 +3,7 @@ CFLAGS_TESTS=-I.
 LFLAGS=-g -Wall -Ofast
 LIBS=-l pthread -l silk
 LIB_SRC=silk_context.c silk_engine.c silk_tls.c
-LIB_HDR=silk_base.h  silk_context.h  silk.h  silk_sched.h  silk_sched_vanilla.h  silk_tls.h
+LIB_HDR=config.h silk_base.h silk_context.h silk.h silk_sched.h silk_sched_vanilla.h silk_tls.h
 LIB_OBJ=silk_context.o silk_engine.o silk_tls.o
 LIB_SILK=libsilk.a
 
@@ -42,5 +42,4 @@ TAGS:
 	etags --output=TAGS *.c *.h
 
 .PHONY: all clean tests
-all:
-	tests TAGS 
+all: tests TAGS 
