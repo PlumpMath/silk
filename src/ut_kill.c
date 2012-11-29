@@ -113,8 +113,7 @@ enum silk_kill_code_path_e {
     SILK_KILL__OTHER_SILK_AND_YEILD,
 #endif
     //TODO: implement all kill code paths
-    SILK_KILL__LAST = SILK_KILL__OTHER_SILK_ON_RET//SILK_KILL__OTHER_THREAD_AND_YEILD,
-
+    SILK_KILL__LAST = SILK_KILL__OTHER_THREAD_AND_YEILD
 };
 
 enum recursion_depth_e {
@@ -247,6 +246,15 @@ ut_kill__recurse_n(int    *p_dummy,
              */
             test_4.is_terminating = true;
             SILK_DEBUG("i'm returning (i.e.: silk terminates naturaly)");
+            break;
+
+        case SILK_KILL__OTHER_THREAD_AND_YEILD:
+            SILK_DEBUG("Silk#%d now waiting for another thread to kill itself",
+                       silk__my_id());
+            test_4.is_busy_waiting = true;
+            wait_on_bool(&test_4.is_killed, true);
+            silk_yield(&msg);
+            assert(0); // since were killed, we shoul NOT be back !!!
             break;
 
 #ifdef MULTI_THREAD_ENGINE
@@ -582,6 +590,13 @@ int main (int   argc, char **argv)
                     assert(silk_stat == SILK_STAT_OK);
                     test_4.is_dispatched = true;
                     wait_on_bool(&test_4.is_terminating, true);
+                    break;
+
+                case SILK_KILL__OTHER_THREAD_AND_YEILD:
+                    wait_on_bool(&test_4.is_busy_waiting, true);
+                    silk_stat = silk_eng_kill(&engine, s);
+                    assert(silk_stat == SILK_STAT_OK);
+                    test_4.is_killed = true;
                     break;
 
 #ifdef MULTI_THREAD_ENGINE
