@@ -5,10 +5,10 @@ DBG :send msg={code=1, id=1, ctx=(nil)}
 DBG :send msg={code=1, id=2, ctx=(nil)}
 DBG :send msg={code=1, id=2, ctx=(nil)}
 DBG :waiting for all BOOT msgs to be processed
-DBG :waiting for all BOOT msgs to be processed
-INFO:Thread starting. id=3078351680
+INFO:Thread starting. id=3077851968
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
 DBG :Silk#0 processing BOOT msg
 DBG :recv msg={code=1, id=1, ctx=(nil)}
 DBG :switching from Silk#0 to Silk#1
@@ -25,14 +25,17 @@ DBG :All Silks completed booting !
 Silk initialization returns:0
 DBG :allocated Silk#0. still 2 available
 allocacated silk No 0
+DBG :dispatching Silk#0
 DBG :send msg={code=2, id=0, ctx=(nil)}
 dispatched silk No 0
 DBG :allocated Silk#1. still 1 available
 allocacated silk No 1
+DBG :dispatching Silk#1
 DBG :send msg={code=2, id=1, ctx=(nil)}
 dispatched silk No 1
 DBG :allocated Silk#2. still 0 available
 allocacated silk No 2
+DBG :dispatching Silk#2
 DBG :send msg={code=2, id=2, ctx=(nil)}
 dispatched silk No 2
 DBG :--------------Dispatching batch # 0 of msgs---------------
@@ -209,7 +212,7 @@ Silk termination returns:0
 DBG :recv msg={code=4, id=0, ctx=(nil)}
 DBG :switching from Silk#2 to Silk#0
 DBG :switched into Silk#0
-INFO:kernel thread 3078351680 processing TERM msg
-INFO:thread 3078351680 switching back to pthread stack
-INFO:Thread exiting. id=3078351680
+INFO:kernel thread 3077851968 processing TERM msg
+INFO:thread 3077851968 switching back to pthread stack
+INFO:Thread exiting. id=3077851968
 Silk join returns:0
