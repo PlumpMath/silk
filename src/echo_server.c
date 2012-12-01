@@ -221,7 +221,7 @@ echo_server_entry_func (void *_arg)
         if (echo_server_rcv_buf(conn, &net_msg.hdr, sizeof(net_msg.hdr)) < 0) {
             goto socket_close;
         }
-        printf("msg hdr completed. len=%d\n", net_msg.hdr.len);
+        printf("msg hdr completed. len=%u\n", (unsigned)net_msg.hdr.len);
 
         printf("Reading the msg text...\n");
         if (echo_server_rcv_buf(conn, net_msg.msg, net_msg.hdr.len) < 0) {

@@ -37,7 +37,7 @@ static void usage()
 {
     fprintf(stderr, "Usage: echo_client [-s <server>] [-p <server port>] [-n <noise [msec]>]\n");
     fprintf(stderr, "Default server: localhost\n");
-    fprintf(stderr, "Default port: %d", ECHO_DERVER_DEFAULT_PORT);
+    fprintf(stderr, "Default port: %d\n", ECHO_DERVER_DEFAULT_PORT);
     fprintf(stderr, "Default noise: 0 (i.e.: no noise! each msg is sent in one take\n");
     exit(-EINVAL);
 }
@@ -80,7 +80,7 @@ int main (int   argc, char **argv)
     struct hostent        *server_addr;
     struct sockaddr_in     sock_addr;
     struct echo_msg_t      msg;
-    int                    text_len;
+    uint16_t               text_len;
     time_t                 random_seed;
     int     c;
 
@@ -136,7 +136,7 @@ int main (int   argc, char **argv)
     printf("Connected ....\n");
 
     for (int i=0; i < NUM_MSGS_TO_SERVER; i++) {
-        text_len = strlen(msgs_for_server[i]);
+        text_len = (uint16_t)strlen(msgs_for_server[i]);
         if (text_len >= sizeof(msg.msg)) {
             printf("msg %d too long\n", i);
             exit(EIO);

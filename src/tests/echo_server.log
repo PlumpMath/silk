@@ -1,0 +1,332 @@
+DBG :send msg={code=1, id=0, ctx=(nil)}
+DBG :send msg={code=1, id=1, ctx=(nil)}
+DBG :send msg={code=1, id=1, ctx=(nil)}
+DBG :send msg={code=1, id=2, ctx=(nil)}
+DBG :send msg={code=1, id=2, ctx=(nil)}
+DBG :send msg={code=1, id=3, ctx=(nil)}
+DBG :send msg={code=1, id=3, ctx=(nil)}
+DBG :send msg={code=1, id=4, ctx=(nil)}
+DBG :send msg={code=1, id=4, ctx=(nil)}
+DBG :send msg={code=1, id=5, ctx=(nil)}
+DBG :send msg={code=1, id=5, ctx=(nil)}
+DBG :send msg={code=1, id=6, ctx=(nil)}
+DBG :send msg={code=1, id=6, ctx=(nil)}
+DBG :send msg={code=1, id=7, ctx=(nil)}
+DBG :send msg={code=1, id=7, ctx=(nil)}
+DBG :send msg={code=1, id=8, ctx=(nil)}
+DBG :send msg={code=1, id=8, ctx=(nil)}
+DBG :send msg={code=1, id=9, ctx=(nil)}
+DBG :send msg={code=1, id=9, ctx=(nil)}
+DBG :send msg={code=1, id=10, ctx=(nil)}
+DBG :send msg={code=1, id=10, ctx=(nil)}
+DBG :send msg={code=1, id=11, ctx=(nil)}
+DBG :send msg={code=1, id=11, ctx=(nil)}
+DBG :send msg={code=1, id=12, ctx=(nil)}
+DBG :send msg={code=1, id=12, ctx=(nil)}
+DBG :send msg={code=1, id=13, ctx=(nil)}
+DBG :send msg={code=1, id=13, ctx=(nil)}
+DBG :send msg={code=1, id=14, ctx=(nil)}
+DBG :send msg={code=1, id=14, ctx=(nil)}
+DBG :send msg={code=1, id=15, ctx=(nil)}
+DBG :send msg={code=1, id=15, ctx=(nil)}
+DBG :send msg={code=1, id=16, ctx=(nil)}
+DBG :send msg={code=1, id=16, ctx=(nil)}
+DBG :send msg={code=1, id=17, ctx=(nil)}
+DBG :send msg={code=1, id=17, ctx=(nil)}
+DBG :send msg={code=1, id=18, ctx=(nil)}
+DBG :send msg={code=1, id=18, ctx=(nil)}
+DBG :send msg={code=1, id=19, ctx=(nil)}
+DBG :send msg={code=1, id=19, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+INFO:Thread starting. id=3077606208
+DBG :Silk#0 booting...
+DBG :recv msg={code=1, id=0, ctx=(nil)}
+DBG :Silk#0 processing BOOT msg
+DBG :recv msg={code=1, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :Silk#1 booting...
+DBG :waiting for all BOOT msgs to be processed
+DBG :recv msg={code=1, id=1, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+DBG :Silk#1 processing BOOT msg
+DBG :recv msg={code=1, id=2, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+DBG :switching from Silk#1 to Silk#2
+DBG :Silk#2 booting...
+DBG :recv msg={code=1, id=2, ctx=(nil)}
+DBG :Silk#2 processing BOOT msg
+DBG :recv msg={code=1, id=3, ctx=(nil)}
+DBG :switching from Silk#2 to Silk#3
+DBG :Silk#3 booting...
+DBG :waiting for all BOOT msgs to be processed
+DBG :recv msg={code=1, id=3, ctx=(nil)}
+DBG :Silk#3 processing BOOT msg
+DBG :recv msg={code=1, id=4, ctx=(nil)}
+DBG :switching from Silk#3 to Silk#4
+DBG :waiting for all BOOT msgs to be processed
+DBG :Silk#4 booting...
+DBG :recv msg={code=1, id=4, ctx=(nil)}
+DBG :Silk#4 processing BOOT msg
+DBG :recv msg={code=1, id=5, ctx=(nil)}
+DBG :switching from Silk#4 to Silk#5
+DBG :Silk#5 booting...
+DBG :recv msg={code=1, id=5, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+DBG :Silk#5 processing BOOT msg
+DBG :recv msg={code=1, id=6, ctx=(nil)}
+DBG :switching from Silk#5 to Silk#6
+DBG :Silk#6 booting...
+DBG :recv msg={code=1, id=6, ctx=(nil)}
+DBG :Silk#6 processing BOOT msg
+DBG :recv msg={code=1, id=7, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+DBG :switching from Silk#6 to Silk#7
+DBG :Silk#7 booting...
+DBG :recv msg={code=1, id=7, ctx=(nil)}
+DBG :Silk#7 processing BOOT msg
+DBG :recv msg={code=1, id=8, ctx=(nil)}
+DBG :switching from Silk#7 to Silk#8
+DBG :waiting for all BOOT msgs to be processed
+DBG :Silk#8 booting...
+DBG :recv msg={code=1, id=8, ctx=(nil)}
+DBG :Silk#8 processing BOOT msg
+DBG :recv msg={code=1, id=9, ctx=(nil)}
+DBG :waiting for all BOOT msgs to be processed
+DBG :switching from Silk#8 to Silk#9
+DBG :Silk#9 booting...
+DBG :recv msg={code=1, id=9, ctx=(nil)}
+DBG :Silk#9 processing BOOT msg
+DBG :recv msg={code=1, id=10, ctx=(nil)}
+DBG :switching from Silk#9 to Silk#10
+DBG :Silk#10 booting...
+DBG :waiting for all BOOT msgs to be processed
+DBG :recv msg={code=1, id=10, ctx=(nil)}
+DBG :Silk#10 processing BOOT msg
+DBG :recv msg={code=1, id=11, ctx=(nil)}
+DBG :switching from Silk#10 to Silk#11
+DBG :Silk#11 booting...
+DBG :recv msg={code=1, id=11, ctx=(nil)}
+DBG :Silk#11 processing BOOT msg
+DBG :waiting for all BOOT msgs to be processed
+DBG :recv msg={code=1, id=12, ctx=(nil)}
+DBG :switching from Silk#11 to Silk#12
+DBG :Silk#12 booting...
+DBG :recv msg={code=1, id=12, ctx=(nil)}
+DBG :Silk#12 processing BOOT msg
+DBG :recv msg={code=1, id=13, ctx=(nil)}
+DBG :switching from Silk#12 to Silk#13
+DBG :Silk#13 booting...
+DBG :recv msg={code=1, id=13, ctx=(nil)}
+DBG :Silk#13 processing BOOT msg
+DBG :recv msg={code=1, id=14, ctx=(nil)}
+DBG :switching from Silk#13 to Silk#14
+DBG :waiting for all BOOT msgs to be processed
+DBG :Silk#14 booting...
+DBG :recv msg={code=1, id=14, ctx=(nil)}
+DBG :Silk#14 processing BOOT msg
+DBG :recv msg={code=1, id=15, ctx=(nil)}
+DBG :switching from Silk#14 to Silk#15
+DBG :Silk#15 booting...
+DBG :recv msg={code=1, id=15, ctx=(nil)}
+DBG :Silk#15 processing BOOT msg
+DBG :recv msg={code=1, id=16, ctx=(nil)}
+DBG :switching from Silk#15 to Silk#16
+DBG :Silk#16 booting...
+DBG :recv msg={code=1, id=16, ctx=(nil)}
+DBG :Silk#16 processing BOOT msg
+DBG :recv msg={code=1, id=17, ctx=(nil)}
+DBG :switching from Silk#16 to Silk#17
+DBG :Silk#17 booting...
+DBG :recv msg={code=1, id=17, ctx=(nil)}
+DBG :Silk#17 processing BOOT msg
+DBG :recv msg={code=1, id=18, ctx=(nil)}
+DBG :switching from Silk#17 to Silk#18
+DBG :Silk#18 booting...
+DBG :recv msg={code=1, id=18, ctx=(nil)}
+DBG :Silk#18 processing BOOT msg
+DBG :recv msg={code=1, id=19, ctx=(nil)}
+DBG :switching from Silk#18 to Silk#19
+DBG :Silk#19 booting...
+DBG :recv msg={code=1, id=19, ctx=(nil)}
+DBG :Silk#19 processing BOOT msg
+DBG :All Silks completed booting !
+DBG :Silk initialization returns:0
+max_fd changes from 0 to 3
+echo_server is listening for incoming connections...
+Need to serve 1 sockets
+socket 3 needs service
+accepted a new connection from 127.0.0.1:59316
+DBG :allocated Silk#0. still 19 available
+DBG :allocated silk No 0
+max_fd changes from 3 to 4
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :dispatched silk No 0
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#19 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+Silk#0 starting to serve client 127.0.0.1
+Silk#0 Waiting for a msg from the client ...
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+Silk#0 received msg. starting to read msg from client ...
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+completed reading buffer of size 2
+msg hdr completed. len=14
+Reading the msg text...
+reading from socket...
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+completed reading buffer of size 14
+msg rcv completed. len=14, text=First Message
+Send echo to client
+Silk#0 Waiting for a msg from the client ...
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+Silk#0 received msg. starting to read msg from client ...
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+completed reading buffer of size 2
+msg hdr completed. len=11
+Reading the msg text...
+reading from socket...
+rcv 11 bytes
+completed reading buffer of size 11
+msg rcv completed. len=11, text=The Second
+Send echo to client
+Silk#0 Waiting for a msg from the client ...
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+Silk#0 received msg. starting to read msg from client ...
+reading from socket...
+rcv 1 bytes
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+reading from socket...
+rcv 1 bytes
+completed reading buffer of size 2
+msg hdr completed. len=21
+Reading the msg text...
+reading from socket...
+rcv 21 bytes
+completed reading buffer of size 21
+msg rcv completed. len=21, text=I'm Third & last one
+Send echo to client
+Silk#0 Waiting for a msg from the client ...
+Need to serve 1 sockets
+socket 4 needs service
+DBG :send msg={code=1000, id=0, ctx=(nil)}
+DBG :recv msg={code=1000, id=0, ctx=(nil)}
+Silk#0 received msg. starting to read msg from client ...
+reading from socket...
+client disconnected
+client disconnected on fd 4. Silk#0 terminates
+clearind socket 4 from master fd_set
+max_fd changes from 4 to 3
+Silk#0 terminating
+INFO:silk 0 ended

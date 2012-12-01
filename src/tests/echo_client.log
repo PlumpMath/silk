@@ -1,0 +1,9 @@
+Initializing RNG seed with 1354370674
+connecting to localhost
+Connected ....
+Sending msg: len=14, text=First Message
+reading msg: len=14, text=First Message
+Sending msg: len=11, text=The Second
+reading msg: len=11, text=The Second
+Sending msg: len=21, text=I'm Third & last one
+reading msg: len=21, text=I'm Third & last one
