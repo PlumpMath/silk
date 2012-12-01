@@ -38,19 +38,16 @@ DBG :send msg={code=1, id=18, ctx=(nil)}
 DBG :send msg={code=1, id=19, ctx=(nil)}
 DBG :send msg={code=1, id=19, ctx=(nil)}
 DBG :waiting for all BOOT msgs to be processed
-INFO:Thread starting. id=3077606208
+INFO:Thread starting. id=3078384448
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 processing BOOT msg
 DBG :recv msg={code=1, id=1, ctx=(nil)}
 DBG :switching from Silk#0 to Silk#1
 DBG :Silk#1 booting...
-DBG :waiting for all BOOT msgs to be processed
 DBG :recv msg={code=1, id=1, ctx=(nil)}
-DBG :waiting for all BOOT msgs to be processed
 DBG :Silk#1 processing BOOT msg
 DBG :recv msg={code=1, id=2, ctx=(nil)}
-DBG :waiting for all BOOT msgs to be processed
 DBG :switching from Silk#1 to Silk#2
 DBG :Silk#2 booting...
 DBG :recv msg={code=1, id=2, ctx=(nil)}
@@ -58,12 +55,11 @@ DBG :Silk#2 processing BOOT msg
 DBG :recv msg={code=1, id=3, ctx=(nil)}
 DBG :switching from Silk#2 to Silk#3
 DBG :Silk#3 booting...
-DBG :waiting for all BOOT msgs to be processed
 DBG :recv msg={code=1, id=3, ctx=(nil)}
 DBG :Silk#3 processing BOOT msg
 DBG :recv msg={code=1, id=4, ctx=(nil)}
-DBG :switching from Silk#3 to Silk#4
 DBG :waiting for all BOOT msgs to be processed
+DBG :switching from Silk#3 to Silk#4
 DBG :Silk#4 booting...
 DBG :recv msg={code=1, id=4, ctx=(nil)}
 DBG :Silk#4 processing BOOT msg
@@ -71,7 +67,6 @@ DBG :recv msg={code=1, id=5, ctx=(nil)}
 DBG :switching from Silk#4 to Silk#5
 DBG :Silk#5 booting...
 DBG :recv msg={code=1, id=5, ctx=(nil)}
-DBG :waiting for all BOOT msgs to be processed
 DBG :Silk#5 processing BOOT msg
 DBG :recv msg={code=1, id=6, ctx=(nil)}
 DBG :switching from Silk#5 to Silk#6
@@ -79,19 +74,16 @@ DBG :Silk#6 booting...
 DBG :recv msg={code=1, id=6, ctx=(nil)}
 DBG :Silk#6 processing BOOT msg
 DBG :recv msg={code=1, id=7, ctx=(nil)}
-DBG :waiting for all BOOT msgs to be processed
 DBG :switching from Silk#6 to Silk#7
 DBG :Silk#7 booting...
 DBG :recv msg={code=1, id=7, ctx=(nil)}
 DBG :Silk#7 processing BOOT msg
 DBG :recv msg={code=1, id=8, ctx=(nil)}
 DBG :switching from Silk#7 to Silk#8
-DBG :waiting for all BOOT msgs to be processed
 DBG :Silk#8 booting...
 DBG :recv msg={code=1, id=8, ctx=(nil)}
 DBG :Silk#8 processing BOOT msg
 DBG :recv msg={code=1, id=9, ctx=(nil)}
-DBG :waiting for all BOOT msgs to be processed
 DBG :switching from Silk#8 to Silk#9
 DBG :Silk#9 booting...
 DBG :recv msg={code=1, id=9, ctx=(nil)}
@@ -99,15 +91,14 @@ DBG :Silk#9 processing BOOT msg
 DBG :recv msg={code=1, id=10, ctx=(nil)}
 DBG :switching from Silk#9 to Silk#10
 DBG :Silk#10 booting...
-DBG :waiting for all BOOT msgs to be processed
 DBG :recv msg={code=1, id=10, ctx=(nil)}
 DBG :Silk#10 processing BOOT msg
 DBG :recv msg={code=1, id=11, ctx=(nil)}
 DBG :switching from Silk#10 to Silk#11
+DBG :waiting for all BOOT msgs to be processed
 DBG :Silk#11 booting...
 DBG :recv msg={code=1, id=11, ctx=(nil)}
 DBG :Silk#11 processing BOOT msg
-DBG :waiting for all BOOT msgs to be processed
 DBG :recv msg={code=1, id=12, ctx=(nil)}
 DBG :switching from Silk#11 to Silk#12
 DBG :Silk#12 booting...
@@ -120,7 +111,6 @@ DBG :recv msg={code=1, id=13, ctx=(nil)}
 DBG :Silk#13 processing BOOT msg
 DBG :recv msg={code=1, id=14, ctx=(nil)}
 DBG :switching from Silk#13 to Silk#14
-DBG :waiting for all BOOT msgs to be processed
 DBG :Silk#14 booting...
 DBG :recv msg={code=1, id=14, ctx=(nil)}
 DBG :Silk#14 processing BOOT msg
@@ -155,7 +145,7 @@ max_fd changes from 0 to 3
 echo_server is listening for incoming connections...
 Need to serve 1 sockets
 socket 3 needs service
-accepted a new connection from 127.0.0.1:59316
+accepted a new connection from 127.0.0.1:61620
 DBG :allocated Silk#0. still 19 available
 DBG :allocated silk No 0
 max_fd changes from 3 to 4

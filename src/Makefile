@@ -58,3 +58,4 @@ TAGS:
 
 .PHONY: all clean tests
 all: tests TAGS 
+	echo "All targets built"

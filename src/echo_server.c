@@ -207,6 +207,7 @@ echo_server_entry_func (void *_arg)
     struct silk_t         *s = silk__my_ctrl();
     struct silk_msg_t      msg;
     struct echo_msg_t      net_msg;
+    uint16_t   text_len;
     struct conn_state_t   *conn = &silk_local_stg[s->silk_id];
 
 
@@ -221,16 +222,16 @@ echo_server_entry_func (void *_arg)
         if (echo_server_rcv_buf(conn, &net_msg.hdr, sizeof(net_msg.hdr)) < 0) {
             goto socket_close;
         }
-        printf("msg hdr completed. len=%u\n", (unsigned)net_msg.hdr.len);
+        text_len = ntohs(net_msg.hdr.len);
+        printf("msg hdr completed. len=%d\n", (unsigned)text_len);
 
         printf("Reading the msg text...\n");
-        if (echo_server_rcv_buf(conn, net_msg.msg, net_msg.hdr.len) < 0) {
+        if (echo_server_rcv_buf(conn, net_msg.msg, text_len) < 0) {
             goto socket_close;
         }
-        printf("msg rcv completed. len=%d, text=%s\n",
-               net_msg.hdr.len, net_msg.msg);
+        printf("msg rcv completed. len=%d, text=%s\n", text_len, net_msg.msg);
         printf("Send echo to client\n");
-        if (send(conn->sock, &net_msg, sizeof(net_msg.hdr) + net_msg.hdr.len, 0) < 0) {
+        if (send(conn->sock, &net_msg, sizeof(net_msg.hdr) + text_len, 0) < 0) {
             printf("failed to write to socket. err=%d\n", errno);
             goto socket_close;
         }

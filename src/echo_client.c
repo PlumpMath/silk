@@ -136,22 +136,22 @@ int main (int   argc, char **argv)
     printf("Connected ....\n");
 
     for (int i=0; i < NUM_MSGS_TO_SERVER; i++) {
-        text_len = (uint16_t)strlen(msgs_for_server[i]);
-        if (text_len >= sizeof(msg.msg)) {
+        text_len = (uint16_t)(strlen(msgs_for_server[i]) + 1); // inc. terminating NULL
+        if (text_len > sizeof(msg.msg)) {
             printf("msg %d too long\n", i);
             exit(EIO);
         }
-        msg.hdr.len = 1 + text_len;
+        msg.hdr.len = htons(text_len);
         strcpy(msg.msg, msgs_for_server[i]);
 
-        printf("Sending msg: len=%d, text=%s\n", msg.hdr.len, msg.msg);
-        send_buffer(sock, &msg, sizeof(msg.hdr) + msg.hdr.len, noise_time);
+        printf("Sending msg: len=%d, text=%s\n", text_len, msg.msg);
+        send_buffer(sock, &msg, sizeof(msg.hdr) + text_len, noise_time);
 
-        if (recv(sock, &msg, sizeof(msg.hdr) + msg.hdr.len, 0) < 0) {
+        if (recv(sock, &msg, sizeof(msg.hdr) + text_len, 0) < 0) {
             printf("failed to read from socket. err=%d\n", errno);
             exit(errno);
         }
-        printf("reading msg: len=%d, text=%s\n", msg.hdr.len, msg.msg);
+        printf("reading msg: len=%d, text=%s\n", ntohs(msg.hdr.len), msg.msg);
     }
 
     return 0;
