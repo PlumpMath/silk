@@ -13,9 +13,23 @@
  *.....
  * on N-1 round, #i sends the msg to (i+n) module N
  * so each silk awaits N-1 msgs & then terminates.
- * each will also verify it receives a msg fomr any other silk & at the correct order.
+ * each will also verify it receives a msg from any other silk & at the correct order.
  * and for desert, we also time the execution so different optimizations & schedulers can be profiled.
  *
+ * Sample msgs sent for CLI "3 3"
+ * since dispatch order is 0,1,2 we'll see
+ * from    to
+ *-------------
+ * 0       1 \
+ * 1       2  = Order of dispatch
+ * 2       0 /
+ * from now the order is set by the order we process msgs of the quue
+ * 1       0
+ * 2       1
+ * 0       2
+ * 0       0
+ * 1       1
+ * 2       2
  *
  * Note: be sure to measure performance with:
  * 1) assertions & logging disabled !!!

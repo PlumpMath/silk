@@ -578,7 +578,7 @@ silk_alloc(struct silk_engine_t   *engine,
         s = SLIST_FIRST(&engine->free_silks);
         SLIST_REMOVE_HEAD(&engine->free_silks, next_free);
         engine->num_free_silk--;
-        assert(engine->num_free_silk > 0);
+        assert(engine->num_free_silk >= 0);
         SILK_DEBUG("allocated Silk#%d. still %d available",
                    s->silk_id, engine->num_free_silk);
         assert(SILK_STATE(s) == SILK_STATE__FREE);
