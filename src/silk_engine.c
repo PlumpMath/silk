@@ -423,7 +423,6 @@ void silk_yield(struct silk_msg_t   *msg)
                 SILK_DEBUG("recycling a terminated Silk#%d", silk_trgt->silk_id);
                 silk__set_state(silk_trgt, SILK_STATE__BOOT);
                 SLIST_INSERT_HEAD(&engine->free_silks, silk_trgt, next_free);
-                printf("!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)\n");
                 // initialize stack context bcz the silk should start from a clean stack.
                 silk_create_initial_stack_context(&silk_trgt->exec_state,
                                                   silk__main,

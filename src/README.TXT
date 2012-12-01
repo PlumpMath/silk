@@ -47,26 +47,20 @@ Note that this does NOT collide with the idea that the engine IDLE callback rout
 so the engine IDLE routine is more for doing anything that will provide new work, e.g.:
 (*) for a network server having a silk per connection it would accept new connection, do the epoll() or select(), ....
 
-5) have a new Makefile target named "ut-logs" - this will create the log of UT programs & send them to their respecive log files.
-comparing the log files before/after a code change will allow us to follow behavioral changes & nail BUGS much earlier.
-
+5)
 
 6) Have a proper Makefile.am that will be processed into a true Makefile with:
 a library
 samples directory
 test applications
 
-7) write a demo program of a network server that uses Silk.
-a simple "echo_server" which replies with whatever it is sent would be a nice example.
-it could be used as a skeleton by others to write their own servers.
-
-
+7) 
 
 
 
 NOW !!!
 ---------
 1) cleanup the drain_msgs()
-cleanup the FIX ME - do we remove the dual BOOT msgs required to boot/recycle a silk instance?
+2) 
 3) when killing a silk, send a number (0-3) of msgs to that silk so that they are dropped properly.
 this will probably fail us & require a generation number in case a silk instance is reused & the second run takes a msg that was sent to the first one.

@@ -47,6 +47,13 @@ echo_client: echo_client.o $(LIB_SILK)
 tests: run_n ping_pong ut_kill echo_server echo_client
 	echo "building all tests"
 
+ut-logs: tests
+	./run_n > tests/run_n.log
+	./run_n 3 3 > tests/run_n.3_3.log
+	./ping_pong 3 3 > tests/ping_pong.33.log
+	./ut_kill > tests/ut_kill.log
+	echo "echo_{client,server} requires manual execution."
+
 clean:
 	rm -f *.o core $(LIB_SILK) run_n ping_pong ut_kill echo_server echo_client
 
