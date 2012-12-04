@@ -112,7 +112,6 @@ enum silk_kill_code_path_e {
      */
     SILK_KILL__OTHER_SILK_AND_YEILD,
 #endif
-    //TODO: implement all kill code paths
     SILK_KILL__LAST = SILK_KILL__OTHER_THREAD_AND_RET
 };
 
@@ -136,11 +135,24 @@ struct test_4_param_t {
     bool     is_busy_waiting;
     bool     is_terminating;
     bool     is_dispatched;
+    void*    post_kill_top_stack_frame_addr;
+    bool     is_post_kill_addr_set;
 } volatile test_4 = {
     .code_path = SILK_KILL__INVALID,
 };
 
+/*
+ * The number of times we'll execute the various code_path's
+ */
+#define NUM_KILL_CODE_PATH_ITERATIONS               10
 
+/*
+ * The maximum difference in the address of initial stack frame variable. we allow some
+ * volatility here bcz expecting to have the same address requires intimate knowledge of
+ * the compiler bcz optimization may cause some stack variables to be in register or in
+ * the same location as other variables whose lifetime have no intersection.
+ */
+#define MAX_REUSE_ADDR_DIFFER                       32
 
 
 /*
@@ -294,7 +306,6 @@ ut_kill__main(void *_arg)
     enum ut_kill_silk_operation   oper = (enum ut_kill_silk_operation)_arg;
     struct silk_t                 *s = silk__my_ctrl();
     struct silk_msg_t             msg;
-    //enum silk_status_e  silk_stat;
     int my_dummy = 0;
 
 
@@ -360,16 +371,24 @@ ut_kill__kill_other_silk(void *_arg)
     exit(EINVAL);
 }
 
-#if 0
-static void switch_recursion_depth(int   *recursion_counter)
+/*
+ * The functions we'll dispatch for execution by the silk that were killed
+ */
+static void
+ut_kill__post_kill_entry_func(void *_arg)
 {
-    if (*recursion_counter == TEST_4_SHALLOW_RECURSION_DEPTH) {
-        *recursion_counter = TEST_4_DEEP_RECURSION_DEPTH;
-    } else {
-        *recursion_counter = TEST_4_SHALLOW_RECURSION_DEPTH;
-    }
+    int      rep = (int)_arg;
+
+    SILK_DEBUG("Silk#%d starts executing post kill code. rep=%d (stack_addr=%p)",
+               silk__my_id(), rep, &rep);
+    assert(rep < NUM_KILL_CODE_PATH_ITERATIONS);
+    SILK_DEBUG("Silk#%d recording initial stack offset", silk__my_id());
+    assert(test_4.post_kill_top_stack_frame_addr == NULL);
+    assert(test_4.is_post_kill_addr_set == false);
+    test_4.post_kill_top_stack_frame_addr = &rep;
+    test_4.is_post_kill_addr_set = true;
 }
-#endif
+
 
 int main (int   argc, char **argv)
 {
@@ -390,6 +409,7 @@ int main (int   argc, char **argv)
     uintptr_t              arg;
     enum silk_status_e     silk_stat;
     int    rep;
+    long   fresh_silk_stk_frame_offset_from_initial_stk_addr;
 
 
     // set CLI defaults
@@ -409,6 +429,22 @@ int main (int   argc, char **argv)
     silk_cfg.num_silk = opt.num_silk;
     silk_stat = silk_init(&engine, &silk_cfg);
     SILK_DEBUG("Silk initialization returns:%d", silk_stat);
+
+
+    // Test 4 preparations (before we alloc/dispatch any silk)
+    SILK_DEBUG("Dispatching the first silk to take the offset of initial frame from initial stack address")
+    silk_stat = silk_alloc(&engine, ut_kill__post_kill_entry_func, (void*)NULL, &s);
+    assert(silk_stat == SILK_STAT_OK);
+    assert(engine.num_free_silk == opt.num_silk - 1);
+    silk_stat = silk_dispatch(&engine, s);
+    assert(silk_stat == SILK_STAT_OK);
+    wait_on_bool(&test_4.is_post_kill_addr_set, true);
+    SILK_DEBUG("silk initial stack addr:%p",
+               silk_get_initial_stack_from_id(&engine, s->silk_id));
+    fresh_silk_stk_frame_offset_from_initial_stk_addr =
+        silk_get_initial_stack_from_id(&engine, s->silk_id) - test_4.post_kill_top_stack_frame_addr;
+    SILK_DEBUG("A fresh Silk uses 0x%x bytes of stack from inital addres (till first frame)",
+               fresh_silk_stk_frame_offset_from_initial_stk_addr);
 
 
     // Test 1 : terminate a non dispacthed silk
@@ -506,6 +542,7 @@ int main (int   argc, char **argv)
     uintptr_t   stk_used;
     silk_id_t   expected_silk_id = s->silk_id;
     void        *prev_top = NULL, *prev_bottom = NULL;
+    long        shallow_addr_difference;
 
 
     printf("Test Case 4\n");
@@ -514,14 +551,15 @@ int main (int   argc, char **argv)
     SILK_DEBUG("Stack range for Silk#%d:start_stk_addr=%p, end_stk_addr=%p", 
                expected_silk_id, (void*)start_stk_addr, (void*)end_stk_addr);
     // repeat the whole test many times to stress the code.
-    for (rep = 0; rep < 10; rep++) {
+    for (rep = 0; rep < NUM_KILL_CODE_PATH_ITERATIONS; rep++) {
         // each time, we'll test all kill scenarios
         for (test_4.code_path = SILK_KILL__FIRST;
              test_4.code_path <= SILK_KILL__LAST; 
              test_4.code_path++) {
-            // posion output info
+            // poison output info
             test_4.top_stack_frame_addr = 0;
             test_4.bottom_stack_frame_addr = 0;
+            shallow_addr_difference = 0;
             // for each iteration,kill-scenario, we'll also try shallow/deep recursion
             for (enum recursion_depth_e  depth = DEPTH_FIRST; depth <= DEPTH_LAST; depth++) {
                 switch (depth) {
@@ -640,6 +678,89 @@ int main (int   argc, char **argv)
 
                 default:
                     assert(0);
+                }
+
+                /*
+                 * Now, dispatch a different work to make sure its executed with a clean
+                 * stack & no leftover msgs. this relies on the fact that __all__ Silk
+                 * entry functions must have the same initial stack address!!!
+                 * Note however that due to compiler optimization, we can never be sure
+                 * that a variable we declare (whose address we take) is indeed on the
+                 * callee's stack (it can also be on the caller's frame), so we allow 
+                 * for a little change in the address as long as its the same every time.
+                 * to simplify it all (as each silk has its own initial stack address), we
+                 * can simply dispatch a silk instance that was never killed & verify that
+                 * those silks that _were_ killed have the same stack frame offset (from
+                 * initial address) as the non killed.
+                 * we do it for 2 silks bcz some code_path codes use 2 silks.
+                 */
+                SILK_DEBUG("Dispatching other kind of work to verify no leftovers from the kill operation");
+
+// The number of silks required for the UT of various code_path's
+#define UT_KILL_MAX_SILKS_USED_IN_CODE_PATH   2
+                typedef struct silk_t* p_silk_t;
+                p_silk_t  silks[UT_KILL_MAX_SILKS_USED_IN_CODE_PATH];
+                long      addr_difference;
+
+
+                /*
+                 * allocate both silks before dispatching so:
+                 * 1) we know both were dispatched
+                 * 2) the two are dispatched in a specific order so they complete
+                 *    in proper order within the free-list.
+                 */
+                for (int i=0; i < UT_KILL_MAX_SILKS_USED_IN_CODE_PATH; i++) {
+                    silk_stat = silk_alloc(&engine, ut_kill__post_kill_entry_func,
+                                           (void*)rep, &silks[i]);
+                    assert(silk_stat == SILK_STAT_OK);
+                }
+                /*
+                 * now verify their execution (note that the log trace is also an
+                 * important part of this UT)
+                 * we dispatch the 2 silks in descending order so to maintain their
+                 * order in the free list of silks
+                 */
+                for (int i=UT_KILL_MAX_SILKS_USED_IN_CODE_PATH-1; i >= 0; i--) {
+                    test_4.post_kill_top_stack_frame_addr = NULL;//poison
+                    test_4.is_post_kill_addr_set = false;
+                    silk_stat = silk_dispatch(&engine, silks[i]);
+                    assert(silk_stat == SILK_STAT_OK);
+                    // wait for the silk to complete
+                    wait_on_bool(&test_4.is_post_kill_addr_set, true);
+                    // check the silk result
+                    // verify the stack address it finds is roughly where we see it in fresh silks.
+                    addr_difference = silk_get_initial_stack_from_id(&engine, silks[i]->silk_id) - test_4.post_kill_top_stack_frame_addr;
+                    SILK_DEBUG("post_kill_top_stack_frame_addr=%p, addr_difference=0x%lx",
+                    test_4.post_kill_top_stack_frame_addr, addr_difference);
+                    // check how much stack we used - not too much!!!
+                    assert(addr_difference <  MAX_SHALLOW_STACK_OFFSET);
+                    // check how much we used now compared with a non-killed silk
+                    assert(labs(fresh_silk_stk_frame_offset_from_initial_stk_addr - addr_difference) < MAX_REUSE_ADDR_DIFFER);
+                    /*
+                     * now check that the DEEP recursion ends up with the same
+                     * stack (post kill) as the SHALLOW one, thereby verifying
+                     * that the stack depth at the time it is killed doesnt matter.
+                     */
+                    switch (depth) {
+                    case DEPTH_SHALLOW:
+                        if (i == UT_KILL_MAX_SILKS_USED_IN_CODE_PATH-1) {
+                            SILK_DEBUG("first SHALLOW doing post-kill work");
+                            assert(shallow_addr_difference == 0);
+                            shallow_addr_difference = addr_difference;
+                        } else {
+                            SILK_DEBUG("non-first SHALLOW doing post-kill work");
+                            assert(shallow_addr_difference == addr_difference);
+                        }
+                        break;
+
+                    case DEPTH_DEEP:
+                        SILK_DEBUG("verifying DEEP & SHALLOW silks doing post-kill work identically");
+                        assert(shallow_addr_difference == addr_difference);
+                        break;
+
+                   default:
+                        assert(0);
+                    }
                 }
             } // for (depth ...
 

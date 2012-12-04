@@ -7,7 +7,9 @@ DBG :send msg={code=1, id=2, ctx=(nil)}
 DBG :send msg={code=1, id=3, ctx=(nil)}
 DBG :send msg={code=1, id=3, ctx=(nil)}
 DBG :waiting for all BOOT msgs to be processed
-INFO:Thread starting. id=3078294336
+DBG :waiting for all BOOT msgs to be processed
+DBG :waiting for all BOOT msgs to be processed
+INFO:Thread starting. id=3077905216
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 processing BOOT msg
@@ -29,6 +31,21 @@ DBG :Silk#3 processing BOOT msg
 ut_kill__idle_cb
 DBG :All Silks completed booting !
 DBG :Silk initialization returns:0
+DBG :Dispatching the first silk to take the offset of initial frame from initial stack address
+DBG :allocated Silk#0. still 3 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#3 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :silk initial stack addr:0xb001ffff
+DBG :a fresh Silk uses 0x139 bytes of stack from inital addres (till first frame)
 Test Case 1
 DBG :allocated Silk#0. still 3 available
 DBG :allocated silk No 0
@@ -42,8 +59,6 @@ DBG :send msg={code=2, id=0, ctx=(nil)}
 DBG :dispatched silk#0 to do busy-wait
 DBG :waiting for the silk to enter busy-wait
 DBG :recv msg={code=2, id=0, ctx=(nil)}
-DBG :switching from Silk#3 to Silk#0
-DBG :switched into Silk#0
 INFO:state= 2
 INFO:silk 0 starting
 DBG :ut_kill__main: Silk#0 starts... (oper=0, stack=0xb001ff6c)
@@ -75,7 +90,6 @@ DBG :wait for silk to call yield()
 DBG :breaking out of busy-wait
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -110,7 +124,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -118,6 +131,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#0, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -134,7 +176,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -142,6 +183,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :saving stack addresses to compare on next runs
 DBG :-----------------iteration#0, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -171,7 +241,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -183,6 +252,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#0, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -211,7 +309,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -223,6 +320,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#0, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -253,6 +379,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#0, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -282,6 +437,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#0, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -298,7 +482,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -306,6 +489,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#0, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -322,7 +534,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -330,6 +541,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#0, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -352,6 +592,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#0, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -373,6 +642,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=0 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=0 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#1, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -390,7 +688,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -398,6 +695,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#1, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -414,7 +740,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -422,6 +747,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#1, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -451,7 +805,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -463,6 +816,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#1, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -491,7 +873,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -503,6 +884,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#1, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -533,6 +943,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#1, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -562,6 +1001,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#1, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -578,7 +1046,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -586,6 +1053,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#1, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -602,7 +1098,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -610,6 +1105,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#1, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -632,6 +1156,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#1, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -653,6 +1206,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=1 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=1 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#2, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -670,7 +1252,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -678,6 +1259,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#2, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -694,7 +1304,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -702,6 +1311,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#2, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -731,7 +1369,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -743,6 +1380,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#2, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -771,7 +1437,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -783,6 +1448,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#2, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -813,6 +1507,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#2, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -842,6 +1565,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#2, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -858,7 +1610,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -866,6 +1617,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#2, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -882,7 +1662,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -890,6 +1669,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#2, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -912,6 +1720,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#2, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -933,6 +1770,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=2 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=2 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#3, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -950,7 +1816,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -958,6 +1823,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#3, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -974,7 +1868,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -982,6 +1875,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#3, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1011,7 +1933,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1023,6 +1944,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#3, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1051,7 +2001,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1063,6 +2012,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#3, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1093,6 +2071,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#3, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -1122,6 +2129,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#3, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1138,7 +2174,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1146,6 +2181,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#3, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1162,7 +2226,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1170,6 +2233,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#3, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1192,6 +2284,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#3, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1213,6 +2334,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=3 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=3 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#4, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1230,7 +2380,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1238,6 +2387,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#4, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1254,7 +2432,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1262,6 +2439,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#4, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1291,7 +2497,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1303,6 +2508,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#4, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1331,7 +2565,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1343,6 +2576,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#4, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1373,6 +2635,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#4, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -1402,6 +2693,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#4, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1418,7 +2738,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1426,6 +2745,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#4, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1442,7 +2790,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1450,6 +2797,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#4, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1472,6 +2848,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#4, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1493,6 +2898,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=4 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=4 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#5, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1510,7 +2944,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1518,6 +2951,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#5, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1534,7 +2996,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1542,6 +3003,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#5, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1571,7 +3061,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1583,6 +3072,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#5, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1611,7 +3129,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1623,6 +3140,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#5, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1653,6 +3199,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#5, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -1682,6 +3257,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#5, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1698,7 +3302,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1706,6 +3309,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#5, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1722,7 +3354,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1730,6 +3361,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#5, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1752,6 +3412,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#5, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1773,6 +3462,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=5 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=5 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#6, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1790,7 +3508,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1798,6 +3515,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#6, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1814,7 +3560,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1822,6 +3567,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#6, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1851,7 +3625,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1863,6 +3636,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#6, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1891,7 +3693,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1903,6 +3704,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#6, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -1933,6 +3763,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#6, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -1962,6 +3821,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#6, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -1978,7 +3866,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -1986,6 +3873,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#6, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2002,7 +3918,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2010,6 +3925,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#6, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2032,6 +3976,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#6, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2053,6 +4026,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=6 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=6 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#7, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2070,7 +4072,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2078,6 +4079,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#7, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2094,7 +4124,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2102,6 +4131,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#7, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2131,7 +4189,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2143,6 +4200,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#7, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2171,7 +4257,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2183,6 +4268,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#7, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2213,6 +4327,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#7, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -2242,6 +4385,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#7, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2258,7 +4430,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2266,6 +4437,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#7, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2282,7 +4482,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2290,6 +4489,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#7, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2312,6 +4540,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#7, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2333,6 +4590,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=7 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=7 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#8, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2350,7 +4636,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2358,6 +4643,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#8, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2374,7 +4688,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2382,6 +4695,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#8, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2411,7 +4753,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2423,6 +4764,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#8, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2451,7 +4821,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2463,6 +4832,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#8, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2493,6 +4891,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#8, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -2522,6 +4949,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#8, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2538,7 +4994,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2546,6 +5001,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#8, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2562,7 +5046,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2570,6 +5053,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#8, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2592,6 +5104,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#8, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2613,6 +5154,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=8 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=8 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#9, path=1, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2630,7 +5200,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2638,6 +5207,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#9, path=1, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2654,7 +5252,6 @@ DBG :Silk#0 killing itself
 DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2662,6 +5259,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#9, path=2, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2691,7 +5317,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2703,6 +5328,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#9, path=2, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2731,7 +5385,6 @@ DBG :Silk#0 killed by Silk#1
 INFO:silk 1 ended
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2743,6 +5396,35 @@ ut_kill__idle_cb
 DBG :Silk#1 killed Silk#0
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#9, path=3, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2773,6 +5455,35 @@ INFO:silk 1 ended
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#1. still 3 available
+DBG :allocated Silk#0. still 2 available
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#9, path=3, depth=1000------------------------
 DBG :allocated Silk#1. still 3 available
 DBG :dispatching Silk#1
@@ -2802,6 +5513,35 @@ INFO:silk 0 ended
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb0043f6c, bottom_stack_frame_addr=0xb0034554
 DBG :stack being used by DEEP silk code:0xfffebaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :-----------------iteration#9, path=4, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2818,7 +5558,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2826,6 +5565,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#9, path=4, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2842,7 +5610,6 @@ DBG :send msg={code=3, id=0, ctx=(nil)}
 DBG :Silk#0 was killed - calling yield
 DBG :recv msg={code=3, id=0, ctx=(nil)}
 DBG :recycling a terminated Silk#0
-!!! FIX ME !!! silk initialization code a bit duplicated above (SLIST)
 DBG :send msg={code=1, id=0, ctx=(nil)}
 DBG :Silk#0 booting...
 DBG :recv msg={code=1, id=0, ctx=(nil)}
@@ -2850,6 +5617,35 @@ DBG :Silk#0 processing BOOT msg
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :-----------------iteration#9, path=5, depth=1------------------------
 DBG :allocated Silk#0. still 3 available
@@ -2872,6 +5668,35 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :SHALLOW: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb001ff14
 DBG :stack being used by SHALLOW silk code:0x94 Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :first SHALLOW doing post-kill work
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :non-first SHALLOW doing post-kill work
 DBG :-----------------iteration#9, path=5, depth=1000------------------------
 DBG :allocated Silk#0. still 3 available
 DBG :dispatching Silk#0
@@ -2893,11 +5718,40 @@ DBG :TERM msg processed by Silk#0 which is already free. skipping
 ut_kill__idle_cb
 DBG :DEEP: top_stack_frame_addr=0xb001ff6c, bottom_stack_frame_addr=0xb0010554
 DBG :stack being used by DEEP silk code:0xfaac Bytes
+DBG :Dispatching other kind of work to verify no leftovers from the kill operation
+DBG :allocated Silk#0. still 3 available
+DBG :allocated Silk#1. still 2 available
+DBG :dispatching Silk#1
+DBG :send msg={code=2, id=1, ctx=(nil)}
+DBG :recv msg={code=2, id=1, ctx=(nil)}
+DBG :switching from Silk#0 to Silk#1
+DBG :switched into Silk#1
+INFO:state= 2
+INFO:silk 1 starting
+DBG :Silk#1 starts executing post kill code. rep=9 (stack_addr=0xb0043f74)
+DBG :Silk#1 recording initial stack offset
+INFO:silk 1 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb0043f74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
+DBG :dispatching Silk#0
+DBG :send msg={code=2, id=0, ctx=(nil)}
+DBG :recv msg={code=2, id=0, ctx=(nil)}
+DBG :switching from Silk#1 to Silk#0
+DBG :switched into Silk#0
+INFO:state= 2
+INFO:silk 0 starting
+DBG :Silk#0 starts executing post kill code. rep=9 (stack_addr=0xb001ff74)
+DBG :Silk#0 recording initial stack offset
+INFO:silk 0 ended
+ut_kill__idle_cb
+DBG :post_kill_top_stack_frame_addr=0xb001ff74, addr_difference=0x8b
+DBG :verifying DEEP & SHALLOW silks doing post-kill work identically
 DBG :verifying stack addresses are identical to previous run
 DBG :send msg={code=4, id=0, ctx=(nil)}
 DBG :Silk termination returns:0
 DBG :recv msg={code=4, id=0, ctx=(nil)}
-INFO:kernel thread 3078294336 processing TERM msg
-INFO:thread 3078294336 switching back to pthread stack
-INFO:Thread exiting. id=3078294336
+INFO:kernel thread 3077905216 processing TERM msg
+INFO:thread 3077905216 switching back to pthread stack
+INFO:Thread exiting. id=3077905216
 DBG :Silk join returns:0

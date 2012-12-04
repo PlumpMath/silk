@@ -169,13 +169,30 @@ struct silk_engine_t {
 
 // verify that a silk ID is valid.
 #define SILK_ASSERT_ID(engine, silk_id)   assert((silk_id) < (engine)->cfg.num_silk)
-
+/*
+ * return the lower address of the buffer used as the stack for a silk.
+ */
 static inline void *
 silk_get_stack_from_id(struct silk_engine_t   *engine,
                        silk_id_t              silk_id)
 {
     SILK_ASSERT_ID(engine, silk_id);
     return engine->stack_addr + silk_id * SILK_PADDED_STACK(&engine->cfg);
+}
+
+/*
+ * This is architecture-specific depending on whether stack grows down/up.
+ * the function returns the initial stack address, (i.e. the address to begin with)
+ */
+static inline void *
+silk_get_initial_stack_from_id(struct silk_engine_t   *engine,
+                               silk_id_t              silk_id)
+{
+#if defined (__i386__)
+    return (silk_get_stack_from_id(engine, silk_id) + SILK_USEABLE_STACK(&engine->cfg) - 1);
+#elif defined (__x86_64__)
+    assert(0); // TODO: implement this
+#endif
 }
 
 static inline struct silk_t *
